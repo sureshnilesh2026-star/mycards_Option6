@@ -36,8 +36,10 @@
         /* Keep X centered during Y animation */
         transform: translateX(-50%) translateY(1000px);
         will-change: transform, opacity;
-        /* Cards now start together; duration is extended so the overall end time stays the same */
-        transition: transform 1150ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 200ms ease-out;
+        /* Staggered starts + spring settle (overshoot easing) */
+        transition:
+          transform 780ms cubic-bezier(0.34, 1.15, 0.55, 1),
+          opacity 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
         pointer-events: none;
       }
       .card-layer.card-in {
@@ -45,6 +47,63 @@
         transform: translateX(-50%) translateY(0px);
         pointer-events: auto;
         cursor: pointer;
+      }
+      /* Last-4 digits: text only inside the card art’s printed box (no extra chip — avoids double-outline) */
+      .card-oncard-digits {
+        position: absolute;
+        left: 62.5%;
+        top: 53%;
+        right: auto;
+        bottom: auto;
+        /* +64px right, +24px down from centered anchor */
+        transform: translate(calc(-50% + 64px), calc(-50% + 24px));
+        box-sizing: border-box;
+        min-width: 0;
+        width: max-content;
+        max-width: none;
+        padding: 0;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 3;
+        opacity: 1;
+        transition: opacity 200ms ease;
+      }
+      .card-oncard-digits--empty {
+        opacity: 0;
+      }
+      .card-oncard-digits__text {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 3px;
+        color: #fff;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+      }
+      /* Fine-tune per asset — number row / last-4 slot varies slightly */
+      #card-millenia .card-oncard-digits {
+        left: 61.75%;
+        top: 52.75%;
+        transform: translate(calc(-50% + 64px), calc(-50% + 24px));
+      }
+      #card-infinia .card-oncard-digits {
+        left: 62.75%;
+        top: 53%;
+      }
+      #card-swiggy .card-oncard-digits {
+        left: 62.25%;
+        top: 53.25%;
+      }
+      #card-tanue .card-oncard-digits {
+        left: 62.5%;
+        top: 53%;
       }
       #wallet-final {
         transform: translateX(-50%) translateY(-50%) translateY(1000px) scale(0.9);
@@ -187,39 +246,67 @@
         </div>
       </div>
 
-      <!-- Separate cards (use exact card PNGs) -->
-      <img
+      <!-- Separate cards (use exact card PNGs); wrapper retains .card-layer motion -->
+      <div
         id="card-infinia"
-        src="assets/card-infinia.png"
-        alt=""
-        draggable="false"
-        aria-hidden="true"
-        class="card-layer absolute left-1/2 top-[502px] w-[312px] h-[200px] object-cover rounded-[12px] z-[6] pointer-events-auto select-none cursor-pointer"
-      />
-      <img
+        class="card-layer absolute left-1/2 top-[502px] w-[312px] h-[200px] z-[6] overflow-hidden rounded-[12px] pointer-events-auto select-none cursor-pointer"
+      >
+        <img
+          src="assets/card-infinia.png"
+          alt=""
+          draggable="false"
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+        />
+        <div class="card-oncard-digits card-oncard-digits--empty" aria-hidden="true">
+          <span class="card-oncard-digits__text"></span>
+        </div>
+      </div>
+      <div
         id="card-tanue"
-        src="assets/card-tatanuo.png"
-        alt=""
-        draggable="false"
-        aria-hidden="true"
-        class="card-layer absolute left-1/2 top-[553px] w-[312px] h-[200px] object-cover rounded-[12px] z-[6] pointer-events-auto select-none cursor-pointer"
-      />
-      <img
+        class="card-layer absolute left-1/2 top-[553px] w-[312px] h-[200px] z-[6] overflow-hidden rounded-[12px] pointer-events-auto select-none cursor-pointer"
+      >
+        <img
+          src="assets/card-tatanuo.png"
+          alt=""
+          draggable="false"
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+        />
+        <div class="card-oncard-digits card-oncard-digits--empty" aria-hidden="true">
+          <span class="card-oncard-digits__text"></span>
+        </div>
+      </div>
+      <div
         id="card-swiggy"
-        src="assets/card-swiggy.png"
-        alt=""
-        draggable="false"
-        aria-hidden="true"
-        class="card-layer absolute left-1/2 top-[604px] w-[312px] h-[200px] object-cover rounded-[12px] z-[6] pointer-events-auto select-none cursor-pointer"
-      />
-      <img
+        class="card-layer absolute left-1/2 top-[604px] w-[312px] h-[200px] z-[6] overflow-hidden rounded-[12px] pointer-events-auto select-none cursor-pointer"
+      >
+        <img
+          src="assets/card-swiggy.png"
+          alt=""
+          draggable="false"
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+        />
+        <div class="card-oncard-digits card-oncard-digits--empty" aria-hidden="true">
+          <span class="card-oncard-digits__text"></span>
+        </div>
+      </div>
+      <div
         id="card-millenia"
-        src="assets/card-millenia.png"
-        alt=""
-        draggable="false"
-        aria-hidden="true"
-        class="card-layer absolute left-1/2 top-[655px] w-[312px] h-[200px] object-cover rounded-[12px] z-[6] pointer-events-auto select-none cursor-pointer"
-      />
+        class="card-layer absolute left-1/2 top-[655px] w-[312px] h-[200px] z-[6] overflow-hidden rounded-[12px] pointer-events-auto select-none cursor-pointer"
+      >
+        <img
+          src="assets/card-millenia.png"
+          alt=""
+          draggable="false"
+          aria-hidden="true"
+          class="absolute inset-0 h-full w-full object-cover pointer-events-none select-none"
+        />
+        <div class="card-oncard-digits card-oncard-digits--empty" aria-hidden="true">
+          <span class="card-oncard-digits__text"></span>
+        </div>
+      </div>
 
       <p
         id="card-select-text"
@@ -244,7 +331,7 @@
         Verify
       </button>
 
-      <!-- Last-4 digits display (replaces the 4 boxes that were inside the keyboard) -->
+      <!-- Last-4 digits display (floating strip + .card-oncard-digits on each card; see CSS + DIGITS_* in script) -->
       <div
         id="card-verify-digits"
         class="absolute left-[290px] top-[420px] -translate-x-1/2 z-[6] opacity-0 pointer-events-none will-change-[top,opacity]"
@@ -349,15 +436,16 @@
           document.getElementById("card-swiggy"),
           document.getElementById("card-millenia"),
         ];
+        /* Slugs for card_details.html?card=… (same order as cards[]). */
+        var CARD_SLUGS = ["infinia", "tanue", "swiggy", "millenia"];
         var isVerifying = false;
         var activeCard = null;
         var enteredDigits = [];
         var postVerifyFinalStack = false;
-        var swiggyPostVerifyPicked = false;
+        var postVerifyFinalPickDone = false;
         var lastVerifiedStackIndex = -1;
-        var SWIGGY_STACK_INDEX = 2;
-        /* Post–verify pick: Swiggy moves this many px up from its stack slot (top). */
-        var SWIGGY_PICK_UP_PX = 500;
+        /* Post–verify pick: selected card animates to this top (px) and scale. */
+        var FINAL_PICK_TOP_PX = 180;
         /* digit strip sits this far below the active card’s top (px); same offset after Done */
         var DIGITS_TOP_OFFSET = 118;
         var CARD_TOP_KEYBOARD = 310;
@@ -365,13 +453,16 @@
         var DIGITS_LEFT = "290px";
         var CARD_MOVE_EASE = "top 600ms cubic-bezier(0.2, 0.8, 0.2, 1)";
         var CARD_STACK_TOPS_PX = [502, 553, 604, 655];
-        var SWIGGY_PICK_TOP_PX = CARD_STACK_TOPS_PX[SWIGGY_STACK_INDEX] - SWIGGY_PICK_UP_PX;
         var STACK_RETURN_RISE_PX = 400;
         var STACK_RETURN_ANIM_MS = 900;
         var INFO_TITLE_VERIFY = "Let’s Verify if It’s You";
         var INFO_TITLE_STACK = "Select Card to Continue";
-        var CARD_DETAILS_PAGE = "card_details.html?card=swiggy";
-        var SWIGGY_PICK_ANIM_MS = 600;
+        var FINAL_PICK_ANIM_MS = 600;
+
+        function cardDetailsHref(stackIdx) {
+          var slug = CARD_SLUGS[stackIdx] || "swiggy";
+          return "card_details.html?card=" + encodeURIComponent(slug);
+        }
 
         function restoreInfoLayerVerifyCopy() {
           if (infoLayerTitle) infoLayerTitle.textContent = INFO_TITLE_VERIFY;
@@ -386,8 +477,20 @@
         }
 
         function renderDigits() {
+          var text = enteredDigits.join("");
           var display = document.getElementById("digit-display");
-          if (display) display.textContent = enteredDigits.join("");
+          if (display) display.textContent = text;
+          var onCardWraps = document.querySelectorAll(".card-oncard-digits");
+          for (var oc = 0; oc < onCardWraps.length; oc++) {
+            var wrap = onCardWraps[oc];
+            var span = wrap.querySelector(".card-oncard-digits__text");
+            if (span) span.textContent = text;
+            if (enteredDigits.length === 0) {
+              wrap.classList.add("card-oncard-digits--empty");
+            } else {
+              wrap.classList.remove("card-oncard-digits--empty");
+            }
+          }
           if (keyboardDone) {
             var complete = enteredDigits.length === 4;
             keyboardDone.disabled = !complete;
@@ -513,20 +616,21 @@
           }
           activeCard = null;
           postVerifyFinalStack = false;
-          swiggyPostVerifyPicked = false;
+          postVerifyFinalPickDone = false;
           lastVerifiedStackIndex = -1;
         }
 
-        function animateSwiggyPostVerifyPick() {
-          if (!postVerifyFinalStack || swiggyPostVerifyPicked) return;
-          swiggyPostVerifyPicked = true;
-          var sw = cards[SWIGGY_STACK_INDEX];
-          if (!sw) return;
+        function animateFinalStackPick(pickedStackIndex) {
+          if (!postVerifyFinalStack || postVerifyFinalPickDone) return;
+          if (pickedStackIndex < 0 || pickedStackIndex >= cards.length) return;
+          var picked = cards[pickedStackIndex];
+          if (!picked) return;
+          postVerifyFinalPickDone = true;
           var pickEase = "600ms cubic-bezier(0.2, 0.8, 0.2, 1)";
           var exitEase = "750ms cubic-bezier(0.2, 0.8, 0.2, 1)";
 
           for (var ci = 0; ci < cards.length; ci++) {
-            if (ci === SWIGGY_STACK_INDEX) continue;
+            if (ci === pickedStackIndex) continue;
             var oc = cards[ci];
             if (!oc) continue;
             oc.style.transition = "transform " + exitEase + ", opacity 560ms ease-out";
@@ -559,26 +663,25 @@
             chooseAnotherCard.classList.remove("opacity-100", "pointer-events-auto");
           }
 
-          sw.style.pointerEvents = "none";
-          sw.style.cursor = "default";
-          sw.style.zIndex = "40";
-          sw.style.transition = "top " + pickEase + ", transform " + pickEase;
-          sw.style.top = SWIGGY_PICK_TOP_PX + "px";
-          sw.style.transform = "translateX(-50%) translateY(0) scale(0.9)";
-          if (
-            lastVerifiedStackIndex === SWIGGY_STACK_INDEX &&
-            digitsWrap &&
-            digitsWrap.classList.contains("opacity-100")
-          ) {
-            digitsWrap.style.zIndex = "41";
-            digitsWrap.style.transition = "top " + pickEase;
-            digitsWrap.style.top = SWIGGY_PICK_TOP_PX + DIGITS_TOP_OFFSET + "px";
+          /* Digits stay on each card via .card-oncard-digits; floating strip stays hidden */
+          if (digitsWrap) {
+            digitsWrap.style.transition = "opacity 400ms ease-out";
+            digitsWrap.classList.add("opacity-0");
+            digitsWrap.classList.remove("opacity-100");
+            digitsWrap.style.opacity = "0";
           }
+
+          picked.style.pointerEvents = "none";
+          picked.style.cursor = "default";
+          picked.style.zIndex = "40";
+          picked.style.transition = "top " + pickEase + ", transform " + pickEase;
+          picked.style.top = FINAL_PICK_TOP_PX + "px";
+          picked.style.transform = "translateX(-50%) translateY(0) scale(0.9)";
           window.setTimeout(function () {
-            if (sw) sw.style.transition = "";
+            if (picked) picked.style.transition = "";
             if (digitsWrap) digitsWrap.style.transition = "";
-            window.location.href = CARD_DETAILS_PAGE;
-          }, SWIGGY_PICK_ANIM_MS);
+            window.location.href = cardDetailsHref(pickedStackIndex);
+          }, FINAL_PICK_ANIM_MS);
         }
 
         function startCardVerifyForCard(cardEl) {
@@ -663,7 +766,6 @@
             });
           }
 
-          resetCardVerifyUI.digitsInit = true;
           enteredDigits = [];
           renderDigits();
         }
@@ -728,7 +830,7 @@
           activeCard = null;
           lastVerifiedStackIndex = activeIdx;
           postVerifyFinalStack = false;
-          swiggyPostVerifyPicked = false;
+          postVerifyFinalPickDone = false;
           renderDigits();
 
           if (el) {
@@ -750,38 +852,19 @@
             keyboard.setAttribute("aria-hidden", "true");
           }
           if (digitsWrap) {
-            digitsWrap.classList.add("pointer-events-none");
-            digitsWrap.classList.remove("opacity-0");
-            digitsWrap.classList.add("opacity-100");
-            digitsWrap.setAttribute("aria-hidden", "false");
-            if (activeIdx >= 0) {
-              var digitFromTop =
-                parseFloat(digitsWrap.style.top, 10) || CARD_TOP_AFTER_DONE + DIGITS_TOP_OFFSET;
-              var digitToTop = CARD_STACK_TOPS_PX[activeIdx] + DIGITS_TOP_OFFSET;
-              digitsWrap.style.zIndex = String(6 + activeIdx);
-              digitsWrap.style.left = DIGITS_LEFT;
-              digitsWrap.style.transition = "none";
-              digitsWrap.style.top = digitFromTop + "px";
-              void digitsWrap.offsetHeight;
-              digitsWrap.style.transition =
-                "top " + STACK_RETURN_ANIM_MS + "ms cubic-bezier(0.2, 0.8, 0.2, 1)";
-              digitsWrap.style.top = digitToTop + "px";
-              window.setTimeout(function () {
-                if (digitsWrap) digitsWrap.style.transition = "";
-              }, STACK_RETURN_ANIM_MS);
-            } else {
-              digitsWrap.style.transition = "opacity 280ms ease-out";
-              digitsWrap.classList.add("opacity-0");
-              digitsWrap.classList.remove("opacity-100");
-              digitsWrap.setAttribute("aria-hidden", "true");
-              window.setTimeout(function () {
-                if (digitsWrap) {
-                  digitsWrap.style.top = "";
-                  digitsWrap.style.left = "";
-                  digitsWrap.style.transition = "";
-                }
-              }, 300);
-            }
+            digitsWrap.classList.add("pointer-events-none", "opacity-0");
+            digitsWrap.classList.remove("opacity-100");
+            digitsWrap.setAttribute("aria-hidden", "true");
+            digitsWrap.style.transition = "opacity 220ms ease-out";
+            digitsWrap.style.opacity = "0";
+            window.setTimeout(function () {
+              if (digitsWrap) {
+                digitsWrap.style.top = "";
+                digitsWrap.style.left = "";
+                digitsWrap.style.transition = "";
+                digitsWrap.style.zIndex = "";
+              }
+            }, 240);
           }
           if (verifyCardCta) {
             verifyCardCta.classList.add("opacity-0", "pointer-events-none");
@@ -870,25 +953,20 @@
               var ck = cards[k];
               if (!ck) continue;
               ck.style.transition = "";
-              if (k === SWIGGY_STACK_INDEX) {
-                ck.style.pointerEvents = "auto";
-                ck.style.cursor = "pointer";
-              } else {
-                ck.style.pointerEvents = "none";
-                ck.style.cursor = "default";
-              }
+              ck.style.pointerEvents = "auto";
+              ck.style.cursor = "pointer";
             }
           }, stackMs);
         }
 
-        // Card click handlers: all cards clickable after they appear; after Verify → final stack, only Swiggy (pick-up animation).
+        // Card click handlers: all cards clickable; after Verify → final stack, any card runs pick-up + card_details navigation.
         for (var i = 0; i < cards.length; i++) {
           (function (idx) {
             var c = cards[idx];
             if (!c) return;
             c.addEventListener("click", function () {
               if (postVerifyFinalStack) {
-                if (idx === SWIGGY_STACK_INDEX) animateSwiggyPostVerifyPick();
+                animateFinalStackPick(idx);
                 return;
               }
               startCardVerifyForCard(c);
@@ -943,6 +1021,12 @@
           });
         }
         if (!el) return;
+        var WALLET_FIRST_ANIM_MS = 700;
+        var WALLET_AFTER_FIRST_PAUSE_MS = 600;
+        var WALLET_TO_BOTTOM_ANIM_MS = 700;
+        var CARDS_AFTER_WALLET_MS = 100;
+        var CARD_IN_ANIM_MS = 780;
+        var CARD_STAGGER_MS = 190;
         // Ensure initial styles are applied before animating
         requestAnimationFrame(function () {
           requestAnimationFrame(function () {
@@ -953,9 +1037,9 @@
         // After the first animation ends, set the size to 95% instantly (no middle scaling animation).
         setTimeout(function () {
           el.classList.add("wallet-resize");
-        }, 720);
+        }, WALLET_FIRST_ANIM_MS + 20);
 
-        // After 3s, animate wallet to the bottom of the frame and reset rotation.
+        // First motion (wallet-in) completes in WALLET_FIRST_ANIM_MS; pause WALLET_AFTER_FIRST_PAUSE_MS, then move wallet to bottom.
         setTimeout(function () {
           if (infoLayer) {
             infoLayer.classList.remove("opacity-0");
@@ -972,35 +1056,46 @@
           el.classList.remove("wallet-in");
           el.classList.remove("wallet-resize");
           el.classList.add("wallet-bottom");
-        }, 3000);
+        }, WALLET_FIRST_ANIM_MS + WALLET_AFTER_FIRST_PAUSE_MS);
 
-        // Card animation should start only after 4000ms total.
-        setTimeout(function () {
+        // Cards pop out 100ms after the wallet finishes moving to the bottom (700ms transform on #wallet-final).
+        setTimeout(
+          function () {
           if (infoLayer) {
             setTimeout(function () {
               infoLayer.classList.remove("top-1/2", "-translate-y-1/2");
               infoLayer.classList.add("top-[116px]", "-translate-y-0");
             }, 300);
           }
-          var staggerMs = 0;
+          var lastCardIndex = -1;
+          for (var ci = 0; ci < cards.length; ci++) {
+            if (cards[ci]) lastCardIndex = ci;
+          }
           for (var i = 0; i < cards.length; i++) {
             if (!cards[i]) continue;
             (function (idx) {
               setTimeout(function () {
                 cards[idx].classList.add("card-in");
-              }, idx * staggerMs);
+              }, idx * CARD_STAGGER_MS);
             })(i);
           }
-          // Ensure verify UI is hidden until a card is clicked; keep green hint hidden until cards finish sliding in (~1150ms).
+          // Green hint after the last card’s motion has time to finish (stagger + shared duration).
+          var hintDelayMs =
+            (lastCardIndex >= 0 ? lastCardIndex * CARD_STAGGER_MS : 0) + CARD_IN_ANIM_MS + 80;
           resetCardVerifyUI({ deferStackHint: true });
           if (cardSelectText) {
             setTimeout(function () {
               cardSelectText.classList.remove("opacity-0");
               cardSelectText.classList.add("opacity-100");
               cardSelectText.removeAttribute("aria-hidden");
-            }, 1200);
+            }, hintDelayMs);
           }
-        }, 4000);
+        },
+          WALLET_FIRST_ANIM_MS +
+            WALLET_AFTER_FIRST_PAUSE_MS +
+            WALLET_TO_BOTTOM_ANIM_MS +
+            CARDS_AFTER_WALLET_MS
+        );
       })();
     </script>
   </body>

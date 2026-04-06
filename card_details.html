@@ -27,16 +27,56 @@
         align-items: center;
         justify-content: center;
         min-height: 100vh;
-        background: #262626; /* neutral-800 */
+        background: #fff;
+      }
+      /* Mobile shell: white base + 360×800 gradient frame under app layers */
+      .mobile-page {
+        position: relative;
+        width: 360px;
+        height: 800px;
+        flex-shrink: 0;
+      }
+      .mobile-page__bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 360px;
+        height: 800px;
+        background: #fff;
+        z-index: 0;
+        pointer-events: none;
+      }
+      .mobile-page__gradient {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 360px;
+        height: 800px;
+        background: linear-gradient(135deg, #0c101f 0%, #131b34 40%);
+        z-index: 1;
+        pointer-events: none;
+        opacity: 0;
+        /* Same opacity timing as .frame-root.cd-intro .frame-root__header-img (top bar) */
+        transition: opacity 0.5s ease-out;
+      }
+      .mobile-page--gradient-in .mobile-page__gradient {
+        opacity: 1;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .mobile-page__gradient {
+          transition: none;
+        }
       }
       .frame-root {
+        position: relative;
+        z-index: 2;
         width: 360px;
         height: 800px;
         flex-shrink: 0;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        background: linear-gradient(135deg, #0c101f 0%, #131b34 40%);
+        background: transparent;
       }
       .frame-root__header-img {
         width: 360px;
@@ -51,6 +91,9 @@
         flex-shrink: 0;
         background-color: transparent;
         line-height: 0;
+      }
+      .frame-root.cd-intro .frame-root__mycards-header {
+        overflow: hidden;
       }
       .frame-root__mycards-svg {
         display: block;
@@ -125,18 +168,25 @@
       .product-chip--w115 {
         width: 115px;
       }
-      /* Cards layer — horizontally scrollable rail (360 frame: ~86% width card, centered + peek) */
-      .frame-root__cards {
+      /* Cards layer — first card top at 213px from frame; rail absolutely placed on frame-root */
+      .frame-root__creditcard {
         flex: 0 0 auto;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 0;
         background: transparent;
         min-width: 0;
+        /* In-flow height: card rail is absolute; reserve card(156)+gap(16)+dots+padding below it */
+        min-height: 220px;
       }
-      .frame-root__cards-scroll {
+      .frame-root__creditcard-scroll {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 213px;
         width: 100%;
         min-width: 0;
+        height: 156px;
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
@@ -144,13 +194,15 @@
         touch-action: pan-x;
         scrollbar-width: none;
         scroll-snap-type: x mandatory;
-        /* (360 − 308) / 2 → card centers; ~12px card gap shows sliver of next card */
-        padding: 10px 26px 0;
+        /* (360 − 264) / 2 → card centers; ~12px card gap shows sliver of next card */
+        padding: 0 48px;
+        box-sizing: border-box;
+        z-index: 2;
       }
-      .frame-root__cards-scroll::-webkit-scrollbar {
+      .frame-root__creditcard-scroll::-webkit-scrollbar {
         display: none;
       }
-      .frame-root__cards-row {
+      .frame-root__creditcard-row {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
@@ -161,9 +213,9 @@
       .bank-card {
         position: relative;
         flex: 0 0 auto;
-        width: 308px;
-        height: 182px;
-        aspect-ratio: 308 / 182;
+        width: 264px;
+        height: 156px;
+        aspect-ratio: 264 / 156;
         border-radius: 14px;
         scroll-snap-align: center;
         scroll-snap-stop: always;
@@ -185,7 +237,15 @@
         outline-offset: 3px;
       }
       .bank-card:active {
-        transform: scale(0.985);
+        filter: brightness(0.96);
+      }
+      /* First card: fixed Y via rail top; no motion from intro transitions */
+      .frame-root__creditcard .bank-card:first-child {
+        transition: none !important;
+        transform: none !important;
+      }
+      .frame-root__creditcard .bank-card:first-child:active {
+        transform: none;
       }
       .bank-card__img {
         display: block;
@@ -194,15 +254,19 @@
         object-fit: contain;
         object-position: center;
       }
-      .frame-root__cards-below {
+      .frame-root__creditcard-below {
         flex: 0 0 auto;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         gap: 16px;
-        padding: 0 26px 18px;
+        /* Frame rail ends at 213+156; headers end ~213px → 156 + 16px gap under card (+8px nudge) */
+        margin-top: 180px;
+        padding: 0 48px 18px;
         line-height: 0;
+        position: relative;
+        z-index: 2;
       }
       .frame-root__card-dots-svg {
         display: block;
@@ -213,7 +277,7 @@
       .frame-root__card-dot {
         fill: #4f4f4f;
         cursor: pointer;
-        transition: fill 0.22s ease;
+        transition: fill 0.32s ease;
       }
       .frame-root__card-dot--active {
         fill: #d9d9d9;
@@ -234,6 +298,7 @@
         background: transparent;
         position: relative;
         z-index: 1;
+        margin-top: -16px;
       }
       .frame-root__card-settings__toggle {
         flex-shrink: 0;
@@ -272,7 +337,7 @@
         height: 14px;
         flex-shrink: 0;
         color: currentColor;
-        transition: transform 0.3s ease;
+        transition: transform 0.42s ease;
       }
       .frame-root__card-settings__chevron svg {
         display: block;
@@ -290,7 +355,7 @@
         max-height: 0;
         overflow: hidden;
         background: transparent;
-        transition: max-height 0.38s ease;
+        transition: max-height 0.5s ease;
       }
       .frame-root__card-settings--open .frame-root__card-settings__panel {
         max-height: 220px;
@@ -743,70 +808,251 @@
       .content3__card-slice--3 .content3__slice-img {
         margin-left: -648px;
       }
-      /* Bottom nav — MyCards Redesign (Figma node 2051-30066) */
+      /*
+       * Bottom nav — full frame width, fixed 78px height; artwork scales in slot (mycards-bottombar.svg).
+       */
       .frame-root__bottombar {
+        position: relative;
         flex-shrink: 0;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-around;
+        align-self: stretch;
         width: 100%;
+        max-width: 100%;
         min-width: 0;
-        min-height: 64px;
-        padding: 12px 4px 14px;
-        background: #2d2d2d;
-        box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.38);
+        min-height: 78px;
+        height: 78px;
+        padding: 0;
+        margin: 0;
+        /* Fills transparent SVG padding (shadow/viewBox) so frame bg doesn’t show as “blue gutters” */
+        background: #333333;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+      .frame-root__bottombar__art {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        line-height: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .frame-root__bottombar__art img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center bottom;
+        vertical-align: top;
+      }
+      .frame-root__bottombar__hits {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        align-items: center;
+        justify-items: center;
+        width: 100%;
+        height: 100%;
         box-sizing: border-box;
       }
       .frame-root__bottombar-item {
-        flex: 1;
-        min-width: 0;
+        box-sizing: border-box;
+        width: 62px;
+        height: 62px;
+        min-width: 62px;
+        min-height: 62px;
+        max-width: 62px;
+        max-height: 62px;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 5px;
         margin: 0;
-        padding: 2px 2px 0;
+        padding: 0;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         background: transparent;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        font-size: 10px;
-        font-weight: 500;
-        line-height: 1.15;
-        letter-spacing: 0.01em;
-        color: #ffffff;
         text-decoration: none;
-        text-align: center;
         cursor: pointer;
         appearance: none;
         -webkit-tap-highlight-color: transparent;
       }
       .frame-root__bottombar-item:focus-visible {
-        outline: 2px solid rgba(255, 255, 255, 0.55);
-        outline-offset: 2px;
+        outline: 2px solid rgba(236, 237, 243, 0.85);
+        outline-offset: -2px;
       }
-      .frame-root__bottombar-icon {
-        display: block;
-        width: 24px;
-        height: 24px;
-        flex-shrink: 0;
-        color: #ffffff;
+
+      /* ─── Page-load intro sequence (slightly slower); first bank card never animates ─── */
+      .frame-root.cd-intro .frame-root__header-img,
+      .frame-root.cd-intro .frame-root__creditcard-below,
+      .frame-root.cd-intro .frame-root__card-settings,
+      .frame-root.cd-intro .content {
+        transition:
+          max-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          min-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          opacity 0.5s ease-out,
+          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          padding 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
-      .frame-root__bottombar-icon svg {
-        display: block;
-        width: 24px;
-        height: 24px;
+      /* Logo: slide only (no max-height “grow”) */
+      .frame-root.cd-intro .frame-root__mycards-svg {
+        transition:
+          opacity 0.5s ease-out,
+          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
-      .frame-root__bottombar-icon text {
-        fill: currentColor;
+      /* Product tabs: slide from right; max-height steps without tween to avoid vertical “scale” */
+      .frame-root.cd-intro .frame-root__product-tabs {
+        transition:
+          opacity 0.5s ease-out,
+          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          padding 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+      .frame-root.cd-intro .frame-root__bottombar {
+        transition:
+          max-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          min-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          opacity 0.5s ease-out,
+          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          padding 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+      .frame-root.cd-intro .frame-root__creditcard-row {
+        transition: gap 0.52s cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+      .frame-root.cd-intro .bank-card:nth-child(n + 2) {
+        transition:
+          opacity 0.5s ease-out,
+          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+
+      /* Initial: only first card area; chrome hidden / collapsed */
+      .frame-root.cd-intro .frame-root__header-img {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translateY(-40px);
+      }
+      .frame-root.cd-intro .frame-root__bottombar {
+        aspect-ratio: unset;
+        max-height: 0;
+        min-height: 0;
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 0;
+        transform: translateY(110%);
+      }
+      .frame-root.cd-intro .frame-root__mycards-svg {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transform: translate3d(0, -64px, 0);
+      }
+      .frame-root.cd-intro .frame-root__product-tabs {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 0;
+        transform: translate3d(360px, 0, 0);
+      }
+      .frame-root.cd-intro .frame-root__creditcard-below {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .frame-root.cd-intro .frame-root__creditcard-row {
+        gap: 0;
+      }
+      .frame-root.cd-intro .bank-card:nth-child(n + 2) {
+        opacity: 0;
+        transform: translate3d(72px, 0, 0);
+        pointer-events: none;
+      }
+      .frame-root.cd-intro .frame-root__card-settings {
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none;
+        max-height: 0;
+        overflow: hidden;
+      }
+      .frame-root.cd-intro .content {
+        opacity: 0;
+        transform: translateY(92%);
+        pointer-events: none;
+      }
+
+      /* Step 2: top (iOS) bar + bottom bar */
+      .frame-root.cd-intro.cd-intro--bars .frame-root__header-img {
+        max-height: 120px;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .frame-root.cd-intro.cd-intro--bars .frame-root__bottombar {
+        max-height: 100px;
+        min-height: 78px;
+        height: 78px;
+        opacity: 1;
+        padding-top: 0;
+        padding-bottom: 0;
+        transform: translateY(0);
+      }
+
+      /* Step 3: MyCards logo strip (slide down from above; max-height steps instantly — not animated) */
+      .frame-root.cd-intro.cd-intro--logo .frame-root__mycards-svg {
+        max-height: 55px;
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+      }
+
+      /* Step 4: product tabs — slide in from right, out of frame */
+      .frame-root.cd-intro.cd-intro--tabs .frame-root__product-tabs {
+        max-height: 120px;
+        opacity: 1;
+        padding: 8px 0 12px;
+        transform: translate3d(0, 0, 0);
+      }
+
+      /* Step 5: other carousel cards + dots */
+      .frame-root.cd-intro.cd-intro--morecards .frame-root__creditcard-row {
+        gap: 12px;
+      }
+      .frame-root.cd-intro.cd-intro--morecards .bank-card:nth-child(n + 2) {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        pointer-events: auto;
+      }
+      .frame-root.cd-intro.cd-intro--morecards .frame-root__creditcard-below {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Step 6: card settings */
+      .frame-root.cd-intro.cd-intro--settings .frame-root__card-settings {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        max-height: 420px;
+        overflow: visible;
+      }
+
+      /* Step 7: white content sheet */
+      .frame-root.cd-intro.cd-intro--content .content {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
       }
     </style>
   </head>
   <body>
-    <div class="frame-root">
+    <div class="mobile-page">
+      <div class="mobile-page__bg" aria-hidden="true"></div>
+      <div class="mobile-page__gradient" aria-hidden="true"></div>
+    <div class="frame-root cd-intro">
       <img
         class="frame-root__header-img"
         src="assets/ios-browser-header.png"
@@ -862,20 +1108,21 @@
           </div>
         </div>
       </div>
-      <div class="frame-root__cards" aria-label="Your cards">
-        <div class="frame-root__cards-scroll">
-          <div class="frame-root__cards-row">
+      <div class="frame-root__creditcard" aria-label="creditcard">
+        <div class="frame-root__creditcard-scroll">
+          <div class="frame-root__creditcard-row">
             <button
               type="button"
               class="bank-card"
+              data-card="swiggy"
               aria-label="Swiggy Credit Card, open details"
             >
               <img
                 class="bank-card__img"
                 src="assets/card-swiggy2.png"
                 alt=""
-                width="308"
-                height="182"
+                width="264"
+                height="156"
                 loading="lazy"
                 draggable="false"
               />
@@ -883,14 +1130,15 @@
             <button
               type="button"
               class="bank-card"
-              aria-label="TATA Neu Card+, open details"
+              data-card="tanue"
+              aria-label="TATA Neu Credit Card, open details"
             >
               <img
                 class="bank-card__img"
                 src="assets/card-tatanuo2.png"
                 alt=""
-                width="308"
-                height="182"
+                width="264"
+                height="156"
                 loading="lazy"
                 draggable="false"
               />
@@ -898,14 +1146,15 @@
             <button
               type="button"
               class="bank-card"
+              data-card="infinia"
               aria-label="Infinia Credit Card, open details"
             >
               <img
                 class="bank-card__img"
                 src="assets/card-infinia2.png"
                 alt=""
-                width="308"
-                height="182"
+                width="264"
+                height="156"
                 loading="lazy"
                 draggable="false"
               />
@@ -913,23 +1162,24 @@
             <button
               type="button"
               class="bank-card"
+              data-card="millenia"
               aria-label="Millenia Credit Card, open details"
             >
               <img
                 class="bank-card__img"
                 src="assets/card-millenia2.png"
                 alt=""
-                width="308"
-                height="182"
+                width="264"
+                height="156"
                 loading="lazy"
                 draggable="false"
               />
             </button>
           </div>
         </div>
-        <div class="frame-root__cards-below">
+        <div class="frame-root__creditcard-below">
           <div
-            id="frame-root__cards-below"
+            id="frame-root__creditcard-below"
             role="group"
             aria-label="Card carousel"
           >
@@ -956,9 +1206,35 @@
           </div>
         </div>
       </div>
+      <script>
+        (function () {
+          var ORDER_BY_CARD = {
+            swiggy: ["swiggy", "tanue", "infinia", "millenia"],
+            tanue: ["tanue", "swiggy", "infinia", "millenia"],
+            infinia: ["infinia", "tanue", "swiggy", "millenia"],
+            millenia: ["millenia", "infinia", "tanue", "swiggy"],
+          };
+          var row = document.querySelector(".frame-root__creditcard-row");
+          if (!row) return;
+          var raw = new URLSearchParams(window.location.search).get("card");
+          var key = (raw && String(raw).trim().toLowerCase()) || "swiggy";
+          if (!ORDER_BY_CARD[key]) key = "swiggy";
+          var order = ORDER_BY_CARD[key];
+          var map = {};
+          row.querySelectorAll(".bank-card[data-card]").forEach(function (btn) {
+            map[btn.getAttribute("data-card")] = btn;
+          });
+          order.forEach(function (slug) {
+            var el = map[slug];
+            if (el) row.appendChild(el);
+          });
+        })();
+      </script>
+      <!-- Card settings: collapsed | expanded — see data-settings-state, aria-expanded, frame-root__card-settings--open -->
       <div
         class="frame-root__card-settings frame-root__card-settings--open"
         id="frame-root-card-settings"
+        data-settings-state="expanded"
       >
         <div
           class="frame-root__card-settings__panel"
@@ -1238,135 +1514,33 @@
         </div>
       </section>
       <nav class="frame-root__bottombar" aria-label="Primary navigation">
-        <a class="frame-root__bottombar-item" href="#" aria-current="page">
-          <span class="frame-root__bottombar-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect
-                x="7.75"
-                y="4.75"
-                width="11.5"
-                height="8.5"
-                rx="1.35"
-                stroke="currentColor"
-                stroke-width="1.4"
-              />
-              <rect
-                x="4.75"
-                y="9.75"
-                width="11.5"
-                height="8.5"
-                rx="1.35"
-                stroke="currentColor"
-                stroke-width="1.4"
-              />
-              <rect
-                x="6.35"
-                y="11.35"
-                width="3.2"
-                height="2.4"
-                rx="0.45"
-                stroke="currentColor"
-                stroke-width="1.15"
-              />
-              <path
-                d="M6.35 14.85h7.4"
-                stroke="currentColor"
-                stroke-width="1.15"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
-          Dashboard
-        </a>
-        <a class="frame-root__bottombar-item" href="#">
-          <span class="frame-root__bottombar-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path
-                d="M6.35 10.15Q12 7.15 17.65 10.15V18.6c0 .62-.5 1.12-1.12 1.12H7.47c-.62 0-1.12-.5-1.12-1.12V10.15Z"
-                stroke="currentColor"
-                stroke-width="1.4"
-                stroke-linejoin="round"
-              />
-              <text
-                x="12"
-                y="14.1"
-                text-anchor="middle"
-                font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-                font-size="7"
-                font-weight="600"
-              >
-                ₹
-              </text>
-              <circle cx="12" cy="17.9" r="1" fill="currentColor" />
-            </svg>
-          </span>
-          SmartPay
-        </a>
-        <a class="frame-root__bottombar-item" href="#">
-          <span class="frame-root__bottombar-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle
-                cx="12"
-                cy="11.75"
-                r="8.1"
-                stroke="currentColor"
-                stroke-width="1.4"
-              />
-              <path
-                d="M12 7.65v8.2M7.9 11.75h8.2"
-                stroke="currentColor"
-                stroke-width="1.4"
-                stroke-linecap="round"
-              />
-            </svg>
-          </span>
-          Add
-        </a>
-        <a class="frame-root__bottombar-item" href="#">
-          <span class="frame-root__bottombar-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect
-                x="5.35"
-                y="5.35"
-                width="13.3"
-                height="13.3"
-                rx="3.1"
-                stroke="currentColor"
-                stroke-width="1.4"
-              />
-              <text
-                x="12"
-                y="15.35"
-                text-anchor="middle"
-                font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-                font-size="9.5"
-                font-weight="400"
-              >
-                %
-              </text>
-            </svg>
-          </span>
-          Explore
-        </a>
-        <a class="frame-root__bottombar-item" href="#">
-          <span class="frame-root__bottombar-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="7" cy="12" r="1.85" fill="currentColor" />
-              <circle cx="12" cy="12" r="1.85" fill="currentColor" />
-              <circle cx="17" cy="12" r="1.85" fill="currentColor" />
-            </svg>
-          </span>
-          More
-        </a>
+        <div class="frame-root__bottombar__art" aria-hidden="true">
+          <img
+            src="assets/mycards-bottombar.svg"
+            alt=""
+            width="384"
+            height="102"
+            decoding="async"
+            draggable="false"
+          />
+        </div>
+        <div class="frame-root__bottombar__hits">
+          <a class="frame-root__bottombar-item" href="#" aria-current="page" aria-label="Dashboard"></a>
+          <a class="frame-root__bottombar-item" href="#" aria-label="SmartPay"></a>
+          <a class="frame-root__bottombar-item" href="#" aria-label="Add"></a>
+          <a class="frame-root__bottombar-item" href="#" aria-label="Explore"></a>
+          <a class="frame-root__bottombar-item" href="#" aria-label="More"></a>
+        </div>
       </nav>
+    </div>
     </div>
     <script>
       (function () {
-        var scrollEl = document.querySelector(".frame-root__cards-scroll");
-        var cards = document.querySelectorAll(".frame-root__cards .bank-card");
+        var scrollEl = document.querySelector(".frame-root__creditcard-scroll");
+        var cards = document.querySelectorAll(".frame-root__creditcard .bank-card");
         if (!scrollEl || !cards.length) return;
 
-        var dotsBelow = document.getElementById("frame-root__cards-below");
+        var dotsBelow = document.getElementById("frame-root__creditcard-below");
         var dotRects = document.querySelectorAll(".frame-root__card-dot");
 
         var smoothScroll =
@@ -1446,6 +1620,15 @@
         scrollEl.addEventListener("scroll", scheduleDotsSync, { passive: true });
         window.addEventListener("resize", syncDotsWithScroll);
 
+        window.addEventListener("card-details-intro-morecards", function () {
+          scrollEl.scrollLeft = 0;
+          requestAnimationFrame(syncDotsWithScroll);
+        });
+        window.addEventListener("card-details-intro-done", function () {
+          scrollEl.scrollLeft = 0;
+          requestAnimationFrame(syncDotsWithScroll);
+        });
+
         requestAnimationFrame(syncDotsWithScroll);
       })();
     </script>
@@ -1474,7 +1657,9 @@
         if (!root || !toggle || !panel) return;
 
         function applyOpen(open) {
+          var stateName = open ? "expanded" : "collapsed";
           root.classList.toggle("frame-root__card-settings--open", open);
+          root.setAttribute("data-settings-state", stateName);
           toggle.setAttribute("aria-expanded", open ? "true" : "false");
           panel.setAttribute("aria-hidden", open ? "false" : "true");
           if ("inert" in panel) {
@@ -1487,6 +1672,85 @@
         });
 
         applyOpen(root.classList.contains("frame-root__card-settings--open"));
+
+        function collapseAfterOneSecond() {
+          window.setTimeout(function () {
+            applyOpen(false);
+          }, 1000);
+        }
+        if (document.querySelector(".frame-root.cd-intro")) {
+          window.addEventListener(
+            "card-details-intro-done",
+            collapseAfterOneSecond,
+            { once: true }
+          );
+        } else {
+          window.addEventListener("load", collapseAfterOneSecond, { once: true });
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        var root = document.querySelector(".frame-root");
+        var shell = document.querySelector(".mobile-page");
+        if (!root) return;
+        if (!root.classList.contains("cd-intro")) {
+          if (shell) shell.classList.add("mobile-page--gradient-in");
+          return;
+        }
+
+        var animMs = 520;
+        var gapMs = 160;
+        var t = 320;
+
+        function after(ms, fn) {
+          window.setTimeout(fn, ms);
+        }
+
+        after(t, function () {
+          root.classList.add("cd-intro--bars");
+          if (shell) shell.classList.add("mobile-page--gradient-in");
+        });
+        t += animMs + gapMs;
+
+        after(t, function () {
+          root.classList.add("cd-intro--logo");
+        });
+        t += animMs + gapMs;
+
+        after(t, function () {
+          root.classList.add("cd-intro--tabs");
+        });
+        t += animMs + gapMs;
+
+        after(t, function () {
+          root.classList.add("cd-intro--morecards");
+          window.dispatchEvent(new CustomEvent("card-details-intro-morecards"));
+        });
+        t += animMs + gapMs;
+
+        after(t, function () {
+          root.classList.add("cd-intro--settings");
+        });
+        t += animMs + gapMs;
+
+        after(t, function () {
+          root.classList.add("cd-intro--content");
+        });
+        t += animMs + gapMs;
+
+        after(t + 200, function () {
+          root.classList.remove(
+            "cd-intro",
+            "cd-intro--bars",
+            "cd-intro--logo",
+            "cd-intro--tabs",
+            "cd-intro--morecards",
+            "cd-intro--settings",
+            "cd-intro--content"
+          );
+          window.dispatchEvent(new CustomEvent("card-details-intro-done"));
+        });
       })();
     </script>
   </body>
