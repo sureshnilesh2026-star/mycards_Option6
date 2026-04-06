@@ -26,12 +26,18 @@
       body::-webkit-scrollbar {
         display: none;
       }
-      /* Phone shell: full width up to 360px; height follows viewport (max 800) */
+      /* Phone shell: full width; height tracks dynamic viewport */
       .frame-root {
         width: 100%;
-        max-width: 360px;
-        height: min(100dvh, 800px);
-        min-height: min(100dvh, 800px);
+        max-width: none;
+        height: 100dvh;
+        min-height: 100dvh;
+      }
+      @supports not (height: 100dvh) {
+        .frame-root {
+          height: 100vh;
+          min-height: 100vh;
+        }
       }
       /* Top chrome: slides in from above (translateY only — no scale) */
       /* Crop system status row (time / Wi‑Fi / battery); 96px Figma chrome = status + app bar */
@@ -148,7 +154,7 @@
         transform: translateX(-50%) translateY(-50%) translateY(var(--wallet-delta, 0px)) rotate(0deg)
           scale(0.9);
       }
-      /* Slide wallet out of the 800px frame when the Verify CTA is shown */
+      /* Slide wallet out of the frame bottom when the Verify CTA is shown */
       #wallet-final.wallet-exit {
         transform: translateX(-50%) translateY(-50%)
           translateY(calc(var(--wallet-delta, 0px) + 520px)) rotate(0deg) scale(0.9);
@@ -188,8 +194,8 @@
       };
     </script>
   </head>
-  <body class="min-h-screen min-h-[100dvh] bg-neutral-800 flex items-center justify-center p-0 px-3 sm:px-6 sm:py-6 box-border">
-    <div class="frame-root relative overflow-hidden rounded-none bg-white flex flex-col flex-shrink-0 mx-auto w-full max-w-[360px] h-[min(100dvh,800px)] min-h-[min(100dvh,800px)]">
+  <body class="min-h-screen min-h-[100dvh] bg-neutral-800 flex items-center justify-center p-0 sm:py-6 box-border w-full">
+    <div class="frame-root relative overflow-hidden rounded-none bg-white flex flex-col flex-shrink-0 w-full h-[100dvh] min-h-[100dvh]">
       <!-- Step: show only WalletFinal; hide all other elements -->
       <!-- Top Bar: visible above all layers (clipped from Figma verify background) -->
       <div
@@ -201,7 +207,7 @@
           src="assets/verify-bg.png"
           alt=""
           draggable="false"
-          class="verify-top-bar-img absolute left-0 w-full h-[800px] select-none pointer-events-none object-cover object-top"
+          class="verify-top-bar-img absolute left-0 w-full min-h-[100dvh] h-[100dvh] select-none pointer-events-none object-cover object-top"
         />
       </div>
 
@@ -437,7 +443,7 @@
         alt=""
         draggable="false"
         id="wallet-final"
-        class="absolute left-1/2 top-1/2 w-full max-w-[360px] h-auto object-contain pointer-events-none select-none z-[10]"
+        class="absolute left-1/2 top-1/2 w-full max-w-full h-auto object-contain pointer-events-none select-none z-[10]"
       />
     </div>
     <script>
@@ -1085,11 +1091,11 @@
           }
           var rect = el.getBoundingClientRect();
           var h = rect.height || 0;
-          // Frame height is 800. With top:50% + translateY(-50%), the element center starts at y=400.
-          // To place bottom at y=800: center should be at 800 - h/2 => delta = 400 - h/2.
-          // Push an extra +200px down from the bottom-aligned position,
-          // then move 25px up.
-          var delta = 400 - h / 2 + 200 - 25;
+          var frameEl = document.querySelector(".frame-root");
+          var frameH = frameEl ? frameEl.getBoundingClientRect().height : window.innerHeight;
+          // Wallet is centered vertically (top:50% + translateY(-50%)). Move so it sits near frame bottom.
+          // Push an extra +200px down from the bottom-aligned position, then move 25px up.
+          var delta = frameH / 2 - h / 2 + 200 - 25;
           el.style.setProperty("--wallet-delta", delta + "px");
           el.classList.remove("wallet-in");
           el.classList.remove("wallet-resize");

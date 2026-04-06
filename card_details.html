@@ -28,19 +28,30 @@
         justify-content: center;
         min-height: 100vh;
         min-height: 100dvh;
-        padding: 0 12px;
+        padding: 0;
         box-sizing: border-box;
         /* Tailwind bg-neutral-800 */
         background: #262626;
       }
-      /* Mobile shell: responsive width (max 360), height capped by viewport or 800 */
+      /* Mobile shell: full width; viewport height — frame scrolls inside so bottom bar stays visible */
       .mobile-page {
         position: relative;
         width: 100%;
-        max-width: 360px;
-        height: min(100dvh, 800px);
-        min-height: min(100dvh, 800px);
+        max-width: none;
+        min-height: 100vh;
+        min-height: 100dvh;
+        height: 100dvh;
+        max-height: 100dvh;
+        display: flex;
+        flex-direction: column;
         flex-shrink: 0;
+        overflow: hidden;
+      }
+      @supports not (height: 100dvh) {
+        .mobile-page {
+          height: 100vh;
+          max-height: 100vh;
+        }
       }
       .mobile-page__bg {
         position: absolute;
@@ -48,9 +59,13 @@
         top: 0;
         width: 100%;
         height: 100%;
-        background: #fff;
+        background-color: #0c101f;
         z-index: 0;
         pointer-events: none;
+        transition: background-color 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
+      }
+      .mobile-page--gradient-in .mobile-page__bg {
+        background-color: #ffffff;
       }
       .mobile-page__gradient {
         position: absolute;
@@ -58,17 +73,27 @@
         top: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #0c101f 0%, #131b34 40%);
+        background: linear-gradient(135deg, #0c101f 0%, #131b34 50%, #1a2545 100%);
         z-index: 1;
         pointer-events: none;
         opacity: 0;
-        transition: opacity 0.5s ease-out;
+        transition: opacity 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
       .mobile-page--gradient-in .mobile-page__gradient {
         opacity: 1;
       }
       @media (prefers-reduced-motion: reduce) {
+        .mobile-page__gradient,
+        .mobile-page__bg {
+          transition: none;
+        }
+        .mobile-page__bg {
+          background-color: #ffffff;
+        }
         .mobile-page__gradient {
+          opacity: 1;
+        }
+        .frame-root.cd-intro .frame-root__bottombar {
           transition: none;
         }
       }
@@ -76,9 +101,9 @@
         position: relative;
         z-index: 2;
         width: 100%;
-        height: 100%;
+        flex: 1 1 auto;
         min-height: 0;
-        flex-shrink: 0;
+        height: auto;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -824,6 +849,8 @@
         height: 78px;
         padding: 0;
         margin: 0;
+        margin-top: auto;
+        z-index: 4;
         /* Fills transparent SVG padding (shadow/viewBox) so frame bg doesn’t show as “blue gutters” */
         background: #333333;
         box-sizing: border-box;
@@ -912,15 +939,6 @@
           transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
           padding 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
-      .frame-root.cd-intro .frame-root__bottombar {
-        transition:
-          max-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
-          min-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
-          height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
-          opacity 0.5s ease-out,
-          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
-          padding 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
-      }
       .frame-root.cd-intro .frame-root__creditcard-row {
         transition: gap 0.52s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
@@ -929,24 +947,26 @@
           opacity 0.5s ease-out,
           transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
-
-      /* Initial: only first card area; chrome hidden / collapsed */
       .frame-root.cd-intro .frame-root__bottombar {
-        aspect-ratio: unset;
-        max-height: 0;
-        min-height: 0;
-        height: 0;
-        opacity: 0;
-        overflow: hidden;
-        padding-top: 0;
-        padding-bottom: 0;
-        transform: translateY(110%);
+        transition:
+          max-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          min-height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          height 0.56s cubic-bezier(0.2, 0.85, 0.2, 1),
+          opacity 0.5s ease-out,
+          transform 0.56s cubic-bezier(0.2, 0.85, 0.2, 1);
       }
+
+      /* Initial: logo above viewport; bottom bar below viewport */
       .frame-root.cd-intro .frame-root__mycards-svg {
-        max-height: 0;
-        opacity: 0;
+        max-height: 55px;
+        opacity: 1;
         overflow: hidden;
-        transform: translate3d(0, -64px, 0);
+        transform: translate3d(0, -100vh, 0);
+      }
+      @supports (height: 100dvh) {
+        .frame-root.cd-intro .frame-root__mycards-svg {
+          transform: translate3d(0, -100dvh, 0);
+        }
       }
       .frame-root.cd-intro .frame-root__product-tabs {
         max-height: 0;
@@ -980,26 +1000,45 @@
         transform: translateY(92%);
         pointer-events: none;
       }
-
-      /* Step 2: bottom bar */
-      .frame-root.cd-intro.cd-intro--bars .frame-root__bottombar {
-        max-height: 100px;
-        min-height: 78px;
-        height: 78px;
-        opacity: 1;
+      .frame-root.cd-intro:not(.cd-intro--logo) .frame-root__bottombar {
+        aspect-ratio: unset;
+        max-height: 0;
+        min-height: 0;
+        height: 0;
+        margin-top: auto;
+        opacity: 0;
+        overflow: hidden;
         padding-top: 0;
         padding-bottom: 0;
-        transform: translateY(0);
+        transform: translateY(100vh);
+        pointer-events: none;
+      }
+      @supports (height: 100dvh) {
+        .frame-root.cd-intro:not(.cd-intro--logo) .frame-root__bottombar {
+          transform: translateY(100dvh);
+        }
       }
 
-      /* Step 3: MyCards logo strip (slide down from above; max-height steps instantly — not animated) */
+      /* Step 1: gradient + bg, MyCards logo, bottom bar slides up (product tabs — step 2 after logo) */
       .frame-root.cd-intro.cd-intro--logo .frame-root__mycards-svg {
         max-height: 55px;
         opacity: 1;
         transform: translate3d(0, 0, 0);
       }
+      .frame-root.cd-intro.cd-intro--logo .frame-root__bottombar {
+        max-height: 100px;
+        min-height: 78px;
+        height: 78px;
+        margin-top: auto;
+        opacity: 1;
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 0;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
 
-      /* Step 4: product tabs — slide in from right, out of frame */
+      /* Step 2: product tabs (top menu) — starts after logo motion finishes */
       .frame-root.cd-intro.cd-intro--tabs .frame-root__product-tabs {
         max-height: 120px;
         opacity: 1;
@@ -1007,7 +1046,7 @@
         transform: translate3d(0, 0, 0);
       }
 
-      /* Step 5: other carousel cards + dots */
+      /* Step 3: other carousel cards + dots */
       .frame-root.cd-intro.cd-intro--morecards .frame-root__creditcard-row {
         gap: 12px;
       }
@@ -1021,7 +1060,7 @@
         pointer-events: auto;
       }
 
-      /* Step 6: card settings */
+      /* Step 4: card settings */
       .frame-root.cd-intro.cd-intro--settings .frame-root__card-settings {
         opacity: 1;
         transform: translateY(0);
@@ -1030,7 +1069,7 @@
         overflow: visible;
       }
 
-      /* Step 7: white content sheet */
+      /* Step 5: white content sheet */
       .frame-root.cd-intro.cd-intro--content .content {
         opacity: 1;
         transform: translateY(0);
@@ -1684,56 +1723,73 @@
 
         var animMs = 520;
         var gapMs = 160;
-        var t = 320;
+        /* Matches .frame-root__mycards-svg / .frame-root__product-tabs transition 0.56s in intro CSS */
+        var logoMotionMs = 560;
+        var tabsMotionMs = 560;
+        var stepPauseMs = animMs + gapMs;
+        /* Carousel cards: begin partway through the tabs motion (≈50%) so they start a bit earlier */
+        var morecardsStartMs = logoMotionMs + Math.round(tabsMotionMs * 0.5);
+        /* Settings + white content: shorter gap so they start a little earlier after carousel / each other */
+        var settingsContentPauseMs = Math.round(stepPauseMs * 0.55);
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         function after(ms, fn) {
           window.setTimeout(fn, ms);
         }
 
-        after(t, function () {
-          root.classList.add("cd-intro--bars");
+        function runIntroSequence(morecardsStartMs) {
+          var t = morecardsStartMs;
+
+          after(t, function () {
+            root.classList.add("cd-intro--morecards");
+            window.dispatchEvent(new CustomEvent("card-details-intro-morecards"));
+          });
+          t += settingsContentPauseMs;
+
+          after(t, function () {
+            root.classList.add("cd-intro--settings");
+          });
+          t += settingsContentPauseMs;
+
+          after(t, function () {
+            root.classList.add("cd-intro--content");
+          });
+          t += settingsContentPauseMs;
+
+          after(t + 200, function () {
+            root.classList.remove(
+              "cd-intro",
+              "cd-intro--logo",
+              "cd-intro--tabs",
+              "cd-intro--morecards",
+              "cd-intro--settings",
+              "cd-intro--content"
+            );
+            window.dispatchEvent(new CustomEvent("card-details-intro-done"));
+          });
+        }
+
+        if (reduceMotion) {
           if (shell) shell.classList.add("mobile-page--gradient-in");
-        });
-        t += animMs + gapMs;
+          root.classList.add("cd-intro--logo", "cd-intro--tabs");
+          runIntroSequence(stepPauseMs);
+          return;
+        }
 
-        after(t, function () {
-          root.classList.add("cd-intro--logo");
+        /* Beat 1: gradient + background tint, header logo, bottom bar */
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            if (shell) shell.classList.add("mobile-page--gradient-in");
+            root.classList.add("cd-intro--logo");
+          });
         });
-        t += animMs + gapMs;
 
-        after(t, function () {
+        /* Beat 2: product tabs — after logo transform/opacity transition ends */
+        after(logoMotionMs, function () {
           root.classList.add("cd-intro--tabs");
         });
-        t += animMs + gapMs;
 
-        after(t, function () {
-          root.classList.add("cd-intro--morecards");
-          window.dispatchEvent(new CustomEvent("card-details-intro-morecards"));
-        });
-        t += animMs + gapMs;
-
-        after(t, function () {
-          root.classList.add("cd-intro--settings");
-        });
-        t += animMs + gapMs;
-
-        after(t, function () {
-          root.classList.add("cd-intro--content");
-        });
-        t += animMs + gapMs;
-
-        after(t + 200, function () {
-          root.classList.remove(
-            "cd-intro",
-            "cd-intro--bars",
-            "cd-intro--logo",
-            "cd-intro--tabs",
-            "cd-intro--morecards",
-            "cd-intro--settings",
-            "cd-intro--content"
-          );
-          window.dispatchEvent(new CustomEvent("card-details-intro-done"));
-        });
+        runIntroSequence(morecardsStartMs);
       })();
     </script>
   </body>

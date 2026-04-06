@@ -23,7 +23,7 @@
               sheet: "0 -8px 24px rgba(0, 0, 0, 0.08)",
             },
             spacing: {
-              /* Auto-layout frame: header (hug) + hero (fill) + sheet (hug 338px); min height = viewport */
+              /* frame: header (hug) + hero (fill) + login sheet (hug content); OTP overlay still uses h-sheet */
               header: "48px",
               sheet: "338px",
             },
@@ -35,16 +35,22 @@
       body {
         font-family: Inter, system-ui, sans-serif;
         -webkit-tap-highlight-color: transparent;
+        margin: 0;
         min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        box-sizing: border-box;
         /* Page chrome outside the phone frame (Tailwind bg-neutral-800) */
         background: #262626;
       }
-      /* Phone shell: column flex; hero gradient #080326 → #0E346B @ 135deg */
+      /* Phone shell: full width; min dynamic viewport height, grows with content */
       .frame-root {
         width: 100%;
-        max-width: 360px;
+        max-width: none;
         min-height: 100vh;
         min-height: 100dvh;
+        height: auto;
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         background: linear-gradient(135deg, #080326 0%, #0e346b 100%);
@@ -128,18 +134,18 @@
       }
     </style>
   </head>
-  <body class="min-h-[100dvh] flex min-h-screen flex-col items-center p-0 px-3 sm:px-0 sm:py-6 box-border w-full">
+  <body class="min-h-[100dvh] min-h-screen p-0 sm:py-6 box-border w-full max-w-none">
     <!--
       PAGE LAYERS (bottom → top, per region)
 
       [Viewport — body]
         L0  Page chrome gray #262626 / bg-neutral-800 on body (outside phone frame)
 
-      [Mobile frame — .frame-root, gradient #080326→#0E346B (135deg), auto-layout column, min-height viewport]
+      [Mobile frame — .frame-root, full width, min-height viewport, grows with content, gradient column]
         L0  Top bar (Figma SVG assets/menu-header.svg + #btn-eva / #btn-menu overlays)
         L1  Hero block (flex-1 min-h-0, fill)
               L0  Marketing art: assets/etb-hero-marketing.svg (z-10, absolute)
-        L2  Bottom sheet (h-sheet 338px, flex-none, aligned to frame bottom)
+        L2  Bottom sheet (height from content, flex-none, aligned to frame bottom)
               • Title, input, helper, #input-hint
               • #btn-otp + spinner
               • Footer copy + nav links
@@ -147,7 +153,7 @@
       [Global overlay]
         L99 Toast #toast (fixed, z-50; hidden via opacity until script shows it)
     -->
-    <div class="frame-root relative mx-auto min-h-0 w-full max-w-[360px] flex-1 overflow-hidden rounded-none sm:shadow-2xl">
+    <div class="frame-root relative w-full overflow-x-hidden rounded-none sm:shadow-2xl">
       <!-- Top menu bar: exact Figma export (360×48), see assets/menu-header.svg -->
       <header class="relative z-30 h-header w-full shrink-0 overflow-hidden">
         <img
@@ -155,7 +161,7 @@
           width="360"
           height="48"
           alt=""
-          class="pointer-events-none block h-header w-full max-w-[360px] select-none"
+          class="pointer-events-none block h-header w-full max-w-full select-none"
           draggable="false"
         />
         <button
@@ -173,27 +179,27 @@
       </header>
 
       <!-- Hero: marketing art only (SVG has no baked-in “Let’s Get Started” sheet; PNG export often does) -->
-      <div class="relative w-full min-h-0 flex-1 overflow-hidden">
+      <div class="relative w-full min-h-0 flex-1 overflow-hidden mb-4">
         <img
           src="assets/etb-hero-marketing.svg"
           width="360"
           height="334"
           alt=""
-          class="absolute left-1/2 top-[32px] z-10 h-full w-full max-w-[360px] -translate-x-1/2 select-none pointer-events-none object-contain object-top"
+          class="absolute left-1/2 top-0 z-10 h-full w-full max-w-full -translate-x-1/2 select-none pointer-events-none object-contain object-top"
           draggable="false"
         />
       </div>
 
       <!-- Bottom sheet: interactive layer (matches Figma spacing; graphics above are unchanged) -->
       <div
-        class="flex flex-col flex-none h-sheet min-h-0 shrink-0 bg-white rounded-t-[24px] shadow-sheet relative z-20 overflow-y-auto overflow-x-hidden px-6 pt-0 pb-0"
+        class="flex flex-col flex-none h-auto min-h-0 shrink-0 bg-white rounded-t-[24px] shadow-sheet relative z-20 overflow-x-hidden px-6 pt-0 pb-0"
       >
         <!-- Login Details top border (4px gradient) -->
         <div
           aria-hidden="true"
           class="absolute left-0 right-0 top-0 h-[4px] bg-[linear-gradient(90deg,#FFB6BA_0%,#3D62F3_50%,#FFB1B6_100%)] z-[1]"
         ></div>
-        <div class="relative z-10 flex min-h-0 flex-1 flex-col pt-6">
+        <div class="relative z-10 flex flex-col pt-6 pb-[30px]">
           <h2 class="text-[17px] font-bold text-neutral-900 leading-tight mb-2">Let’s Get Started</h2>
 
           <div class="mobile-field block">
@@ -229,7 +235,7 @@
           </button>
 
           <div
-            class="mt-auto mb-[30px] box-border flex max-w-none w-[calc(100%+3rem)] -mx-6 flex-col items-center pt-2 pb-2"
+            class="mt-8 box-border flex max-w-none w-[calc(100%+3rem)] -mx-6 flex-col items-center pt-2 pb-2"
           >
             <p class="w-full px-6 text-center text-[11px] leading-snug text-neutral-400">
               © Copyright 2023 HDFC Bank Ltd.
@@ -259,7 +265,7 @@
       ></div>
       <div
         id="otp-sheet"
-        class="absolute left-0 right-0 bottom-0 h-sheet w-full max-w-[360px] bg-[#fdfeff] rounded-t-[26px] overflow-hidden translate-y-full opacity-0 pointer-events-none transition-transform duration-300 ease-out transition-opacity z-[50]"
+        class="absolute left-0 right-0 bottom-0 h-sheet w-full max-w-full bg-[#fdfeff] rounded-t-[26px] overflow-hidden translate-y-full opacity-0 pointer-events-none transition-transform duration-300 ease-out transition-opacity z-[50]"
         role="dialog"
         aria-modal="true"
         aria-label="Enter OTP"
