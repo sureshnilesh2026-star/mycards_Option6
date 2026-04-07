@@ -226,6 +226,22 @@
         transition: transform 750ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 550ms ease-out;
         pointer-events: none;
       }
+      #verify-success-toast {
+        transition: opacity 220ms ease-out;
+      }
+      .verify-success-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 9999px;
+        background: #16a34a;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        line-height: 1;
+        font-weight: 700;
+      }
     </style>
     <script>
       tailwind.config = {
@@ -408,6 +424,16 @@
       >
         Verify
       </button>
+      <div
+        id="verify-success-toast"
+        class="absolute inset-0 z-[85] opacity-0 pointer-events-none flex items-center justify-center bg-black/25"
+        aria-hidden="true"
+      >
+        <div class="w-[248px] rounded-[16px] bg-white px-5 py-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)] text-center">
+          <div class="mx-auto verify-success-icon">✓</div>
+          <p class="mt-3 text-[16px] font-semibold leading-tight text-[#111827]">Verify Successful!</p>
+        </div>
+      </div>
 
       <!-- Last-4 digits display (floating strip + .card-oncard-digits on each card; see CSS + DIGITS_* in script) -->
       <div
@@ -520,6 +546,7 @@
         var cardSelectText = document.getElementById("card-select-text");
         var chooseAnotherCard = document.getElementById("choose-another-card");
         var verifyCardCta = document.getElementById("verify-card-cta");
+        var verifySuccessToast = document.getElementById("verify-success-toast");
         var keyboard = document.getElementById("card-verify-keyboard");
         var keyboardDone = document.getElementById("keyboard-done");
         var digitsWrap = document.getElementById("card-verify-digits");
@@ -545,8 +572,13 @@
         var FINAL_PICK_TOP_PX = 80;
         /* digit strip sits this far below the active card’s top (px); same offset after Done */
         var DIGITS_TOP_OFFSET = 118;
-        var CARD_TOP_KEYBOARD = 280;
+        var VERIFY_INPUT_LIFT_PX = 80;
+        var CARD_TOP_KEYBOARD_BASE = 280;
+        var CARD_TOP_KEYBOARD = CARD_TOP_KEYBOARD_BASE - VERIFY_INPUT_LIFT_PX;
         var CARD_TOP_AFTER_DONE = 440;
+        var CARD_SELECT_VERIFY_TOP_BASE = 228;
+        var CHOOSE_ANOTHER_VERIFY_TOP_BASE = 258;
+        var INFO_LAYER_VERIFY_TOP_BASE = -78;
         var DIGITS_LEFT = "50%";
         var CARD_MOVE_EASE = "top 600ms cubic-bezier(0.2, 0.8, 0.2, 1)";
         /* Fallback tops before wallet reaches .wallet-bottom (no-js / first paint) */
@@ -555,13 +587,19 @@
         /* Y of topmost card in stack = (wallet img top in frame) − this (see getWalletTopInFrame) */
         var CARD_STACK_OFFSET_ABOVE_WALLET = 210;
         /* Vertical gap between hint / “Add Card” bottom and top-of-stack (px) */
-        var CARD_SELECT_GAP_ABOVE_STACK = 4;
+        var CARD_SELECT_GAP_ABOVE_STACK = 2;
         var CARD_ADD_LINK_GAP_ABOVE_STACK = 4;
         var STACK_RETURN_RISE_PX = 400;
         var STACK_RETURN_ANIM_MS = 900;
         var INFO_TITLE_VERIFY = "Let’s Verify if It’s You";
         var INFO_TITLE_STACK = "Select Card to Continue";
         var FINAL_PICK_ANIM_MS = 600;
+        var CARD_SELECT_VERIFY_TOP = CARD_SELECT_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
+        var CHOOSE_ANOTHER_VERIFY_TOP = CHOOSE_ANOTHER_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
+        var INFO_LAYER_VERIFY_TOP = INFO_LAYER_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
+        var POST_INPUT_SHIFT_UP_PX = 60;
+        var VERIFY_SUCCESS_MS = 2000;
+        var isVerifySuccessShowing = false;
 
         function getWalletTopInFrame() {
           if (!frameShell || !el) return 0;
@@ -882,7 +920,7 @@
           restoreInfoLayerVerifyCopy();
 
           if (infoLayer) {
-            infoLayer.style.top = "-78px";
+            infoLayer.style.top = INFO_LAYER_VERIFY_TOP + "px";
             infoLayer.classList.remove("-translate-y-1/2");
             infoLayer.classList.add("-translate-y-0");
             infoLayer.classList.remove("opacity-0");
@@ -914,7 +952,7 @@
           if (cardSelectText) {
             cardSelectText.classList.remove("card-select-text--above-stack");
             cardSelectText.textContent = "Enter last 4 digits to verify this Card";
-            cardSelectText.style.top = "228px";
+            cardSelectText.style.top = CARD_SELECT_VERIFY_TOP + "px";
             cardSelectText.style.color = "";
             cardSelectText.style.fontWeight = "";
             cardSelectText.style.fontSize = "";
@@ -925,7 +963,7 @@
           if (chooseAnotherCard) {
             chooseAnotherCard.classList.remove("choose-another--above-stack");
             chooseAnotherCard.textContent = "Choose Another Card";
-            chooseAnotherCard.style.top = "258px";
+            chooseAnotherCard.style.top = CHOOSE_ANOTHER_VERIFY_TOP + "px";
             chooseAnotherCard.style.transition = "";
             chooseAnotherCard.classList.remove("opacity-0");
             chooseAnotherCard.classList.add("opacity-100");
@@ -978,19 +1016,19 @@
 
           // Move content down to final state, matching reference layout.
           if (infoLayer) {
-            infoLayer.style.top = "82px";
+            infoLayer.style.top = 82 - POST_INPUT_SHIFT_UP_PX + "px";
           }
           if (cardSelectText) {
             cardSelectText.classList.remove("card-select-text--above-stack");
-            cardSelectText.style.top = "388px";
+            cardSelectText.style.top = 388 - POST_INPUT_SHIFT_UP_PX + "px";
           }
           if (chooseAnotherCard) {
             chooseAnotherCard.classList.remove("choose-another--above-stack");
-            chooseAnotherCard.style.top = "418px";
+            chooseAnotherCard.style.top = 418 - POST_INPUT_SHIFT_UP_PX + "px";
           }
           if (activeCard) {
             activeCard.style.transition = CARD_MOVE_EASE;
-            activeCard.style.top = CARD_TOP_AFTER_DONE + "px";
+            activeCard.style.top = CARD_TOP_AFTER_DONE - POST_INPUT_SHIFT_UP_PX + "px";
           }
           if (digitsWrap && activeCard) {
             digitsWrap.style.zIndex = "35";
@@ -1084,7 +1122,7 @@
           if (infoLayer) {
             infoLayer.style.top = "";
             infoLayer.classList.remove("top-1/2", "-translate-y-1/2", "opacity-0");
-            infoLayer.classList.add("top-[116px]", "-translate-y-0", "opacity-100");
+            infoLayer.classList.add("top-[92px]", "-translate-y-0", "opacity-100");
           }
           if (infoLayerTitle) {
             infoLayerTitle.textContent = INFO_TITLE_STACK;
@@ -1248,7 +1286,22 @@
         }
         if (verifyCardCta) {
           verifyCardCta.addEventListener("click", function () {
-            returnToStackAfterVerify();
+            if (isVerifySuccessShowing) return;
+            isVerifySuccessShowing = true;
+            if (verifySuccessToast) {
+              verifySuccessToast.classList.remove("opacity-0", "pointer-events-none");
+              verifySuccessToast.classList.add("opacity-100");
+              verifySuccessToast.setAttribute("aria-hidden", "false");
+            }
+            window.setTimeout(function () {
+              if (verifySuccessToast) {
+                verifySuccessToast.classList.add("opacity-0", "pointer-events-none");
+                verifySuccessToast.classList.remove("opacity-100");
+                verifySuccessToast.setAttribute("aria-hidden", "true");
+              }
+              isVerifySuccessShowing = false;
+              returnToStackAfterVerify();
+            }, VERIFY_SUCCESS_MS);
           });
         }
         if (keyboardDone) {
@@ -1301,7 +1354,7 @@
           if (infoLayer) {
             setTimeout(function () {
               infoLayer.classList.remove("top-1/2", "-translate-y-1/2");
-              infoLayer.classList.add("top-[116px]", "-translate-y-0");
+              infoLayer.classList.add("top-[92px]", "-translate-y-0");
             }, 300);
           }
           var lastCardIndex = -1;
