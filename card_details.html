@@ -544,7 +544,8 @@
         flex-direction: column;
         align-items: stretch;
         gap: 16px;
-        overflow-x: visible;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       .content1__options {
         flex-shrink: 0;
@@ -713,7 +714,8 @@
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
-        overflow: visible;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       .content1__explore-heading {
         flex-shrink: 0;
@@ -843,7 +845,8 @@
         margin-left: 0;
         margin-right: 0;
         box-sizing: border-box;
-        overflow-x: visible;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       .content1__emi-head {
         display: flex;
@@ -854,7 +857,8 @@
         max-width: 100%;
         min-width: 0;
         box-sizing: border-box;
-        overflow-x: visible;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       .content1__emi-head-left {
         display: flex;
@@ -1015,7 +1019,7 @@
         text-align: right;
         flex: 0 0 auto;
       }
-      /* content2: full width of content body; horizontal inset for cards via scroll padding */
+      /* content2: full width; deals rail flush L/R (no scroll padding) */
       .content2 {
         flex-shrink: 0;
         display: flex;
@@ -1096,7 +1100,7 @@
         max-width: 100%;
         margin-left: 0px;
         margin-right: 0px;
-        padding: 0 16px 8px 16px;
+        padding: 0 0 8px 0;
         box-sizing: border-box;
         align-self: stretch;
         height: max-content;
@@ -1104,7 +1108,7 @@
         max-height: none;
         container-type: inline-size;
         container-name: content2-cards;
-        scroll-padding-inline: 16px;
+        scroll-padding-inline: 0;
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
@@ -1130,7 +1134,7 @@
       .content2__card-img {
         display: block;
         width: 268px;
-        width: min(268px, calc(100cqi - 32px));
+        width: min(268px, 100cqi);
         height: auto;
         max-height: none;
         flex-shrink: 0;
@@ -1145,27 +1149,28 @@
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
-        width: calc(100% - 32px);
-        max-width: calc(100% - 32px);
+        width: 100%;
+        max-width: 100%;
         min-width: 0;
         margin-top: 0;
         margin-bottom: 0;
-        margin-left: 16px;
-        margin-right: 16px;
+        margin-left: 0px;
+        margin-right: 0px;
         padding: 0;
         box-sizing: border-box;
         align-self: stretch;
-        overflow: visible;
+        overflow-x: hidden;
+        overflow-y: visible;
       }
       .content3__heading {
         flex-shrink: 0;
-        width: calc(100% + 32px);
-        max-width: none;
+        width: 100%;
+        max-width: 100%;
         min-width: 0;
         margin-top: 0;
         margin-bottom: 0;
-        margin-left: -16px;
-        margin-right: -16px;
+        margin-left: 0;
+        margin-right: 0;
         padding: 0;
         box-sizing: border-box;
         line-height: 1;
@@ -1217,11 +1222,11 @@
       .content3__scroll {
         flex-shrink: 0;
         min-width: 0;
-        width: calc(100% + 32px);
-        max-width: none;
-        margin-left: -16px;
-        margin-right: -16px;
-        padding: 0 16px;
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 0;
         box-sizing: border-box;
         height: 327px;
         overflow-x: auto;
