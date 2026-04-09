@@ -476,11 +476,8 @@
           var targetRect = isOtpInputFocused
             ? otpVerifyBtn.getBoundingClientRect()
             : btnOtp.getBoundingClientRect();
-          // Device-adaptive reserve so CTA stays above keyboard + accessory bar.
-          var keyboardHeight = Math.max(0, window.innerHeight - viewportBottom);
-          var bottomReserve = keyboardHeight > 0
-            ? Math.min(132, Math.max(96, Math.round(keyboardHeight * 0.25)))
-            : 12;
+          // Keep sheets slightly lower while keyboard is open (visible overlap).
+          var bottomReserve = 32;
           var safeBottom = viewportBottom - bottomReserve;
           var overlap = Math.max(0, targetRect.bottom - safeBottom);
           var shiftY = Math.min(overlap, 420);
