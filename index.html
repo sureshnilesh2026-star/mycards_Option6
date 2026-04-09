@@ -508,9 +508,16 @@
           otpBackdrop.classList.remove("opacity-0", "pointer-events-none");
           otpBackdrop.classList.add("opacity-100", "pointer-events-auto");
 
-          setTimeout(function () {
-            otpRaw.focus();
-          }, 100);
+          // Start keyboard open with sheet slide-in (instead of after it).
+          requestAnimationFrame(function () {
+            otpRaw.focus({ preventScroll: true });
+            // Fallback for browsers that ignore early focus during transition.
+            setTimeout(function () {
+              if (document.activeElement !== otpRaw) {
+                otpRaw.focus({ preventScroll: true });
+              }
+            }, 80);
+          });
         }
 
         function closeOtp() {
