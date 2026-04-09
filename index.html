@@ -153,6 +153,13 @@
         color: transparent;
         -webkit-text-fill-color: transparent;
       }
+      /* Smooth lift when browser reports keyboard inset via VisualViewport */
+      #otp-sheet {
+        transition:
+          transform 300ms cubic-bezier(0, 0, 0.2, 1),
+          opacity 300ms cubic-bezier(0, 0, 0.2, 1),
+          bottom 200ms ease;
+      }
     </style>
   </head>
   <body class="min-h-[100dvh] min-h-screen p-0 box-border w-full max-w-none">
@@ -332,11 +339,12 @@
             <!-- Real input (tap to focus; digits captured in JS) -->
             <input
               id="otp-raw"
-              type="tel"
+              type="text"
               inputmode="numeric"
               autocomplete="one-time-code"
               pattern="[0-9]*"
               maxlength="6"
+              enterkeyhint="done"
               class="absolute inset-0 opacity-0"
               aria-label="OTP code"
             />
@@ -460,6 +468,29 @@
           window.scrollTo(0, 0);
         }
 
+        function getVisualKeyboardInset() {
+          var vv = window.visualViewport;
+          if (!vv) return 0;
+          return Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        }
+
+        function applyOtpKeyboardInset() {
+          if (!otpSheet || !otpRaw) return;
+          var inset = getVisualKeyboardInset();
+          var otpFocused = document.activeElement === otpRaw;
+          var sheetOpen = otpSheet.classList.contains("translate-y-0");
+          if (otpFocused && sheetOpen && inset > 32) {
+            otpSheet.style.bottom = Math.round(inset) + "px";
+          } else {
+            otpSheet.style.bottom = "";
+          }
+        }
+
+        function syncViewportKeyboard() {
+          updateKeyboardShift();
+          applyOtpKeyboardInset();
+        }
+
         mobile.addEventListener("focus", function () {
           isMobileInputFocused = true;
           setTimeout(updateKeyboardShift, 50);
@@ -471,40 +502,45 @@
         });
 
         if (window.visualViewport) {
-          window.visualViewport.addEventListener("resize", updateKeyboardShift);
-          window.visualViewport.addEventListener("scroll", updateKeyboardShift);
+          window.visualViewport.addEventListener("resize", syncViewportKeyboard);
+          window.visualViewport.addEventListener("scroll", syncViewportKeyboard);
         }
 
-        function focusOtpField() {
-          try {
-            otpRaw.focus({ preventScroll: true });
-          } catch (e) {
-            otpRaw.focus();
-          }
-        }
+        otpRaw.addEventListener("focus", function () {
+          applyOtpKeyboardInset();
+          setTimeout(applyOtpKeyboardInset, 80);
+          setTimeout(applyOtpKeyboardInset, 280);
+        });
+
+        otpRaw.addEventListener("blur", function () {
+          otpSheet.style.bottom = "";
+        });
 
         function openOtp(last4) {
-          if (mobile) mobile.blur();
           otpLast4.textContent = last4;
           otpRaw.value = "";
           otpRaw.dispatchEvent(new Event("input"));
           syncOtpDots();
 
+          mobile.blur();
+
+          otpSheet.style.bottom = "";
           otpSheet.classList.remove("translate-y-full", "opacity-0", "pointer-events-none");
           otpSheet.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
           otpBackdrop.classList.remove("opacity-0", "pointer-events-none");
           otpBackdrop.classList.add("opacity-100", "pointer-events-auto");
 
-          // Focus must run in the same user gesture as "Get OTP" on iOS/iPad; avoid long setTimeout before this.
-          // Double rAF waits for pointer-events/layout after the sheet opens.
+          /* Must run in the same user-gesture turn as the tap (no setTimeout) so iOS/iPadOS opens the keyboard */
+          otpRaw.focus({ preventScroll: true });
           requestAnimationFrame(function () {
-            requestAnimationFrame(function () {
-              focusOtpField();
-            });
+            otpRaw.focus({ preventScroll: true });
+            applyOtpKeyboardInset();
           });
         }
 
         function closeOtp() {
+          otpRaw.blur();
+          otpSheet.style.bottom = "";
           otpSheet.classList.add("translate-y-full", "opacity-0", "pointer-events-none");
           otpSheet.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
           otpBackdrop.classList.add("opacity-0", "pointer-events-none");
@@ -550,7 +586,7 @@
           otpLabel.classList.add("hidden");
           otpSpinner.classList.remove("hidden");
 
-          // Open OTP immediately so otpRaw.focus stays inside the tap's user activation (mobile Safari / iPad).
+          /* Open sheet + focus in this same tap turn so mobile Safari/iPadOS shows the keyboard */
           openOtp(v.slice(-4));
 
           setTimeout(function () {
