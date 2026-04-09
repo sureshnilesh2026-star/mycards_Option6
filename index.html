@@ -442,6 +442,7 @@
         var otpSpinner = document.getElementById("otp-spinner");
         var frameRoot = document.querySelector(".frame-root");
         var isMobileInputFocused = false;
+        var isOtpInputFocused = false;
 
         var defaultInfoText = "You’ll receive an OTP on this number";
 
@@ -469,13 +470,20 @@
         }
 
         function updateKeyboardShift() {
-          if (!isMobileInputFocused || !frameRoot) return;
+          if ((!isMobileInputFocused && !isOtpInputFocused) || !frameRoot) return;
           var vv = window.visualViewport;
-          var viewportHeight = vv ? vv.height : window.innerHeight;
-          var ctaRect = btnOtp.getBoundingClientRect();
-          var safeBottom = viewportHeight - 12;
-          var overlap = Math.max(0, ctaRect.bottom - safeBottom);
-          var shiftY = Math.min(overlap, 260);
+          var viewportBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+          var targetRect = isOtpInputFocused
+            ? otpVerifyBtn.getBoundingClientRect()
+            : btnOtp.getBoundingClientRect();
+          // Device-adaptive reserve so CTA stays above keyboard + accessory bar.
+          var keyboardHeight = Math.max(0, window.innerHeight - viewportBottom);
+          var bottomReserve = keyboardHeight > 0
+            ? Math.min(132, Math.max(96, Math.round(keyboardHeight * 0.25)))
+            : 12;
+          var safeBottom = viewportBottom - bottomReserve;
+          var overlap = Math.max(0, targetRect.bottom - safeBottom);
+          var shiftY = Math.min(overlap, 420);
           frameRoot.style.transition = "transform 180ms ease";
           frameRoot.style.transform = shiftY > 0 ? "translateY(-" + Math.round(shiftY) + "px)" : "";
           window.scrollTo(0, 0);
@@ -488,7 +496,17 @@
 
         mobile.addEventListener("blur", function () {
           isMobileInputFocused = false;
-          resetKeyboardShift();
+          if (!isOtpInputFocused) resetKeyboardShift();
+        });
+
+        otpRaw.addEventListener("focus", function () {
+          isOtpInputFocused = true;
+          setTimeout(updateKeyboardShift, 0);
+        });
+
+        otpRaw.addEventListener("blur", function () {
+          isOtpInputFocused = false;
+          if (!isMobileInputFocused) resetKeyboardShift();
         });
 
         if (window.visualViewport) {
@@ -523,20 +541,26 @@
           otpBackdrop.classList.add("opacity-100", "pointer-events-auto");
 
           // Start keyboard open with sheet slide-in (instead of waiting for a tap).
+          isOtpInputFocused = true;
           focusOtpFieldForKeyboard();
+          updateKeyboardShift();
           requestAnimationFrame(focusOtpFieldForKeyboard);
+          requestAnimationFrame(updateKeyboardShift);
           setTimeout(function () {
             if (document.activeElement !== otpRaw) {
               focusOtpFieldForKeyboard();
             }
+            updateKeyboardShift();
           }, 120);
         }
 
         function closeOtp() {
+          isOtpInputFocused = false;
           otpSheet.classList.add("translate-y-full", "opacity-0", "pointer-events-none");
           otpSheet.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
           otpBackdrop.classList.add("opacity-0", "pointer-events-none");
           otpBackdrop.classList.remove("opacity-100", "pointer-events-auto");
+          if (!isMobileInputFocused) resetKeyboardShift();
         }
 
         otpBackdrop.addEventListener("click", function () {
