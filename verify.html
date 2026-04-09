@@ -335,8 +335,10 @@
           id="info-layer-subtext"
           class="w-[328px] text-center text-[#4b5563] text-[12px] leading-[1.4] opacity-80"
         >
-          <p>We’ll auto-add all your cards and other</p>
-          <p>linked products</p>
+          <p class="m-0">
+            We have found following cards<br />
+            on this mobile number
+          </p>
         </div>
       </div>
 
@@ -735,6 +737,236 @@
           renderDigits();
         }
 
+        /** Stack Y targets (px) for seated wallet; uses a non-active card’s current top when possible */
+        function getChooseAnotherStackTopsPx(activeIdx) {
+          var ref = -1;
+          var refTop = NaN;
+          for (var i = 0; i < cards.length; i++) {
+            if (i === activeIdx) continue;
+            var c = cards[i];
+            if (!c) continue;
+            var t = parseFloat(c.style.top, 10);
+            if (isNaN(t)) t = parseFloat(getComputedStyle(c).top, 10);
+            if (!isNaN(t)) {
+              ref = i;
+              refTop = t;
+              break;
+            }
+          }
+          if (ref < 0 || isNaN(refTop)) return getStackTopsPx();
+          var base = refTop - ref * CARD_STACK_GAP;
+          var out = [];
+          for (var j = 0; j < cards.length; j++) {
+            out.push(base + j * CARD_STACK_GAP);
+          }
+          return out;
+        }
+
+        /** Selected card eases to its stack Y; wallet + other cards rise from below (same pattern as returnToStackAfterVerify) */
+        function animateReturnToStackFromChooseAnother() {
+          if (!isVerifying || !activeCard) {
+            resetCardVerifyUI();
+            return;
+          }
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            resetCardVerifyUI();
+            return;
+          }
+
+          var prev = activeCard;
+          var activeIdx = stackIndexOfCard(prev);
+          if (activeIdx < 0) {
+            resetCardVerifyUI();
+            return;
+          }
+
+          var stackEase = "cubic-bezier(0.2, 0.8, 0.2, 1)";
+          var stackMs = STACK_RETURN_ANIM_MS;
+
+          var selectedFromTop = parseFloat(prev.style.top, 10);
+          if (isNaN(selectedFromTop)) selectedFromTop = parseFloat(getComputedStyle(prev).top, 10);
+          if (isNaN(selectedFromTop)) selectedFromTop = CARD_TOP_KEYBOARD;
+
+          enteredDigits = [];
+          renderDigits();
+          setFloatingDigitStripActive(false);
+
+          if (keyboard) {
+            keyboard.classList.add("opacity-0", "pointer-events-none", "translate-y-0");
+            keyboard.classList.remove("opacity-100", "pointer-events-auto", "translate-y-[320px]");
+            keyboard.setAttribute("aria-hidden", "true");
+          }
+          if (verifyCardCta) {
+            verifyCardCta.classList.add("opacity-0", "pointer-events-none");
+            verifyCardCta.classList.remove("opacity-100", "pointer-events-auto");
+          }
+          if (digitsWrap) {
+            digitsWrap.style.transition = "opacity 200ms ease-out";
+            digitsWrap.classList.add("opacity-0", "pointer-events-none");
+            digitsWrap.classList.remove("opacity-100");
+            digitsWrap.setAttribute("aria-hidden", "true");
+            window.setTimeout(function () {
+              if (!digitsWrap) return;
+              digitsWrap.style.top = "";
+              digitsWrap.style.left = "";
+              digitsWrap.style.transition = "";
+              digitsWrap.style.zIndex = "";
+            }, 220);
+          }
+
+          if (chooseAnotherCard) {
+            chooseAnotherCard.classList.remove("choose-another--above-stack");
+            chooseAnotherCard.style.transition = "opacity 260ms ease-out";
+            chooseAnotherCard.classList.add("opacity-0", "pointer-events-none");
+            chooseAnotherCard.classList.remove("opacity-100", "pointer-events-auto");
+            chooseAnotherCard.style.top = "";
+          }
+
+          restoreInfoLayerVerifyCopy();
+          if (infoLayer) {
+            infoLayer.style.transition = "top 600ms ease-out, transform 600ms ease-out, opacity 300ms ease-out";
+            infoLayer.style.top = "";
+            infoLayer.style.transform = "";
+            infoLayer.style.opacity = "";
+            infoLayer.classList.remove("opacity-0");
+            infoLayer.classList.add("opacity-100");
+            infoLayer.removeAttribute("aria-hidden");
+          }
+
+          if (cardSelectText) {
+            cardSelectText.textContent = "Select any card to verify";
+            cardSelectText.style.color = "";
+            cardSelectText.style.fontWeight = "";
+            cardSelectText.style.fontSize = "";
+            cardSelectText.classList.add("opacity-0");
+            cardSelectText.setAttribute("aria-hidden", "true");
+          }
+
+          var stackTopsReturn;
+          if (el && frameShell) {
+            el.classList.remove("wallet-exit", "wallet-drop-away");
+            var walletPrevTransition = el.style.transition;
+            el.style.transition = "none";
+            el.classList.remove("wallet-rise-start");
+            el.classList.add("wallet-bottom");
+            el.style.opacity = "";
+            void el.offsetHeight;
+            var wTopMeas =
+              el.getBoundingClientRect().top - frameShell.getBoundingClientRect().top;
+            var stackBaseMeas = wTopMeas - CARD_STACK_OFFSET_ABOVE_WALLET;
+            stackTopsReturn = [];
+            for (var sm = 0; sm < cards.length; sm++) {
+              stackTopsReturn.push(stackBaseMeas + sm * CARD_STACK_GAP);
+            }
+            el.classList.remove("wallet-bottom");
+            el.classList.add("wallet-rise-start");
+            el.style.transition = walletPrevTransition || "";
+            void el.offsetHeight;
+          } else {
+            stackTopsReturn = getChooseAnotherStackTopsPx(activeIdx);
+          }
+
+          activeCard = null;
+          isVerifying = false;
+
+          for (var i = 0; i < cards.length; i++) {
+            var c = cards[i];
+            if (!c) continue;
+            c.style.pointerEvents = "none";
+            c.style.cursor = "default";
+            c.style.transition = "none";
+            var stackTop = stackTopsReturn[i];
+
+            if (i === activeIdx) {
+              c.style.top = selectedFromTop + "px";
+              c.style.opacity = "1";
+              c.style.transform = "translateX(-50%) translateY(0)";
+            } else {
+              c.style.top = stackTop + "px";
+              c.style.opacity = "0";
+              c.style.transform =
+                "translateX(-50%) translateY(" + STACK_RETURN_RISE_PX + "px)";
+            }
+            c.style.zIndex = "";
+          }
+          void (cards[0] && cards[0].offsetHeight);
+
+          function primeChooseAnotherTransitions() {
+            for (var j = 0; j < cards.length; j++) {
+              var cj = cards[j];
+              if (!cj) continue;
+              if (j === activeIdx) {
+                cj.style.transition =
+                  "top " + stackMs + "ms " + stackEase + ", transform " + stackMs + "ms " + stackEase;
+              } else {
+                cj.style.transition =
+                  "transform " +
+                  stackMs +
+                  "ms " +
+                  stackEase +
+                  ", opacity " +
+                  stackMs +
+                  "ms " +
+                  stackEase;
+              }
+            }
+            void (cards[0] && cards[0].offsetHeight);
+          }
+
+          function applyChooseAnotherEndState() {
+            if (el) {
+              el.style.transition = "transform " + stackMs + "ms " + stackEase;
+              el.classList.remove("wallet-rise-start");
+              el.classList.add("wallet-bottom");
+              window.setTimeout(function () {
+                if (el) el.style.transition = "";
+              }, stackMs);
+            }
+            for (var j = 0; j < cards.length; j++) {
+              var cj = cards[j];
+              if (!cj) continue;
+              var stackTopJ = stackTopsReturn[j];
+              cj.style.top = stackTopJ + "px";
+              cj.style.transform = "translateX(-50%) translateY(0)";
+              cj.style.opacity = "1";
+              cj.style.zIndex = "";
+            }
+            if (el) el.style.zIndex = "";
+          }
+
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              primeChooseAnotherTransitions();
+              requestAnimationFrame(applyChooseAnotherEndState);
+            });
+          });
+
+          window.setTimeout(function () {
+            for (var k = 0; k < cards.length; k++) {
+              var ck = cards[k];
+              if (!ck) continue;
+              ck.style.transition = "";
+              ck.style.pointerEvents = "auto";
+              ck.style.cursor = "pointer";
+              ck.style.zIndex = "";
+            }
+            postVerifyFinalStack = false;
+            postVerifyFinalPickDone = false;
+            lastVerifiedStackIndex = -1;
+            applyCardStackTops();
+            if (el) el.style.zIndex = "";
+            if (cardSelectText) {
+              cardSelectText.classList.remove("opacity-0");
+              cardSelectText.classList.add("opacity-100");
+              cardSelectText.removeAttribute("aria-hidden");
+            }
+            if (chooseAnotherCard) {
+              chooseAnotherCard.textContent = "Choose Another Card";
+              chooseAnotherCard.style.transition = "";
+            }
+          }, stackMs + 40);
+        }
+
         function resetCardVerifyUI(opts) {
           opts = opts || {};
           var deferStackHint = opts.deferStackHint === true;
@@ -748,6 +980,7 @@
             el.classList.add("wallet-bottom");
             el.style.opacity = "";
             el.style.transition = "";
+            el.style.zIndex = "";
           }
 
           if (keyboard) {
@@ -1152,7 +1385,7 @@
             if (!c) continue;
             var stackTop = stackTopsReturn[i];
             c.style.pointerEvents = "none";
-            c.style.zIndex = String(6 + i);
+            c.style.zIndex = "";
             c.style.transition = "none";
 
             if (i === activeIdx) {
@@ -1210,7 +1443,9 @@
               cj.style.top = stackTopJ + "px";
               cj.style.transform = "translateX(-50%) translateY(0)";
               cj.style.opacity = "1";
+              cj.style.zIndex = "";
             }
+            if (el) el.style.zIndex = "";
           }
 
           requestAnimationFrame(function () {
@@ -1229,6 +1464,7 @@
               ck.style.transitionDelay = "";
               ck.style.pointerEvents = "auto";
               ck.style.cursor = "pointer";
+              ck.style.zIndex = "";
             }
             applyCardStackTops();
           }, stackMs + 120);
@@ -1279,7 +1515,7 @@
         if (chooseAnotherCard) {
           chooseAnotherCard.addEventListener("click", function () {
             if (isVerifying) {
-              resetCardVerifyUI();
+              animateReturnToStackFromChooseAnother();
               return;
             }
           });
