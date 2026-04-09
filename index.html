@@ -48,8 +48,7 @@
         min-height: 100dvh;
         width: 100%;
         box-sizing: border-box;
-        /* Page chrome outside the phone frame (Tailwind bg-neutral-800) */
-        background: #262626;
+        background: #ffffff;
       }
       /* Phone shell: full width; min dynamic viewport height, grows with content */
       .frame-root {
@@ -170,7 +169,7 @@
       PAGE LAYERS (bottom → top, per region)
 
       [Viewport — body]
-        L0  Page chrome gray #262626 / bg-neutral-800 on body (outside phone frame)
+        L0  Page chrome white on body (outside phone frame)
 
       [Mobile frame — .frame-root, full width, min-height viewport, grows with content, gradient column]
         L0  Top bar (Figma SVG assets/menu-header.svg + #btn-eva / #btn-menu overlays)
@@ -547,7 +546,10 @@
           window.location.href = "verify.html";
         });
 
-        btnOtp.addEventListener("click", function () {
+        var getOtpHandledByTouch = false;
+        var getOtpFlowActive = false;
+        function runGetOtpFlow() {
+          if (btnOtp.disabled || getOtpFlowActive) return;
           var v = mobile.value.trim();
           if (!/^\d{10}$/.test(v)) {
             hint.classList.add("hidden");
@@ -555,6 +557,11 @@
             mobile.focus();
             return;
           }
+
+          getOtpFlowActive = true;
+          mobile.blur();
+          resetKeyboardShift();
+          isMobileInputFocused = false;
 
           setInfoText(defaultInfoText, false);
           btnOtp.disabled = true;
@@ -567,10 +574,30 @@
             otpLabel.textContent = "Get OTP";
             btnOtp.disabled = false;
             btnOtp.setAttribute("aria-busy", "false");
+            getOtpFlowActive = false;
 
             // Open OTP overlay from bottom of the same page
             openOtp(v.slice(-4));
           }, 1500);
+        }
+
+        btnOtp.addEventListener(
+          "touchend",
+          function (e) {
+            if (btnOtp.disabled) return;
+            e.preventDefault();
+            getOtpHandledByTouch = true;
+            runGetOtpFlow();
+            window.setTimeout(function () {
+              getOtpHandledByTouch = false;
+            }, 500);
+          },
+          { passive: false }
+        );
+
+        btnOtp.addEventListener("click", function () {
+          if (getOtpHandledByTouch) return;
+          runGetOtpFlow();
         });
       })();
     </script>

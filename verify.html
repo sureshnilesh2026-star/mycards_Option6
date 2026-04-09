@@ -27,6 +27,7 @@
         scrollbar-width: none;
         -ms-overflow-style: none;
         box-sizing: border-box;
+        background: #ffffff;
       }
       body::-webkit-scrollbar {
         display: none;
@@ -229,6 +230,29 @@
       #verify-success-toast {
         transition: opacity 220ms ease-out;
       }
+      #verify-success-toast .verify-success-toast__backdrop {
+        opacity: 0;
+        transition: opacity 220ms ease-out;
+      }
+      #verify-success-toast .verify-success-toast__sheet {
+        transform: translateY(100%);
+        transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        will-change: transform;
+      }
+      #verify-success-toast.verify-success-toast--open .verify-success-toast__backdrop {
+        opacity: 1;
+      }
+      #verify-success-toast.verify-success-toast--open .verify-success-toast__sheet {
+        transform: translateY(0);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #verify-success-toast .verify-success-toast__sheet {
+          transition: none;
+        }
+        #verify-success-toast .verify-success-toast__backdrop {
+          transition: none;
+        }
+      }
       .verify-success-icon {
         width: 52px;
         height: 52px;
@@ -258,7 +282,7 @@
       };
     </script>
   </head>
-  <body class="bg-neutral-800 flex items-start justify-center p-0 box-border w-full h-[100dvh]">
+  <body class="bg-white flex items-start justify-center p-0 box-border w-full h-[100dvh]">
     <div class="frame-root relative rounded-none bg-white flex flex-col flex-shrink-0 w-full">
       <!-- Step: show only WalletFinal; hide all other elements -->
       <!-- Top Bar: visible above all layers (clipped from Figma verify background) -->
@@ -428,12 +452,21 @@
       </button>
       <div
         id="verify-success-toast"
-        class="absolute inset-0 z-[85] opacity-0 pointer-events-none flex items-center justify-center bg-black/25"
+        class="absolute inset-0 z-[85] flex flex-col justify-end opacity-0 pointer-events-none"
         aria-hidden="true"
       >
-        <div class="w-[248px] rounded-[16px] bg-white px-5 py-5 shadow-[0_12px_32px_rgba(0,0,0,0.25)] text-center">
+        <div class="verify-success-toast__backdrop absolute inset-0 bg-black/25" aria-hidden="true"></div>
+        <div
+          class="verify-success-toast__sheet relative w-full rounded-t-[24px] bg-white pt-3 px-6 pb-10 shadow-[0_-8px_24px_rgba(0,0,0,0.12)] flex flex-col items-center text-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="verify-success-title"
+        >
+          <span class="mb-5 block h-1 w-10 shrink-0 rounded-full bg-neutral-200" aria-hidden="true"></span>
           <div class="mx-auto verify-success-icon">✓</div>
-          <p class="mt-3 text-[16px] font-semibold leading-tight text-[#111827]">Verify Successful!</p>
+          <p id="verify-success-title" class="mt-4 text-[16px] font-semibold leading-tight text-[#111827]">
+            Verify Successful!
+          </p>
         </div>
       </div>
 
@@ -601,6 +634,7 @@
         var INFO_LAYER_VERIFY_TOP = INFO_LAYER_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
         var POST_INPUT_SHIFT_UP_PX = 60;
         var VERIFY_SUCCESS_MS = 2000;
+        var VERIFY_SUCCESS_SHEET_MS = 320;
         var isVerifySuccessShowing = false;
 
         function getWalletTopInFrame() {
@@ -1528,15 +1562,25 @@
               verifySuccessToast.classList.remove("opacity-0", "pointer-events-none");
               verifySuccessToast.classList.add("opacity-100");
               verifySuccessToast.setAttribute("aria-hidden", "false");
+              requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                  if (verifySuccessToast) verifySuccessToast.classList.add("verify-success-toast--open");
+                });
+              });
             }
             window.setTimeout(function () {
               if (verifySuccessToast) {
-                verifySuccessToast.classList.add("opacity-0", "pointer-events-none");
-                verifySuccessToast.classList.remove("opacity-100");
-                verifySuccessToast.setAttribute("aria-hidden", "true");
+                verifySuccessToast.classList.remove("verify-success-toast--open");
               }
-              isVerifySuccessShowing = false;
-              returnToStackAfterVerify();
+              window.setTimeout(function () {
+                if (verifySuccessToast) {
+                  verifySuccessToast.classList.add("opacity-0", "pointer-events-none");
+                  verifySuccessToast.classList.remove("opacity-100");
+                  verifySuccessToast.setAttribute("aria-hidden", "true");
+                }
+                isVerifySuccessShowing = false;
+                returnToStackAfterVerify();
+              }, VERIFY_SUCCESS_SHEET_MS);
             }, VERIFY_SUCCESS_MS);
           });
         }
