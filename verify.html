@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content"
+    />
     <title>Verify OTP — MyCards</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -40,19 +43,20 @@
         overflow: hidden;
         text-shadow: none;
       }
-      /* ≤1024px: hide Figma keypad; OS keyboard drives #verify-last4-native (width-only, no pointer heuristics) */
-      @media (max-width: 1024px) {
+      /* Phone / tablet (incl. iPad landscape to 1366px): hide Figma keypad; OS keyboard drives #verify-last4-native */
+      @media (max-width: 1366px) {
         #card-verify-keyboard {
           display: none !important;
           visibility: hidden !important;
           pointer-events: none !important;
         }
       }
-      /* Hidden input for device numeric keyboard (not used on desktop fine-pointer wide layout) */
+      /* In-layout focus hook: keeps element in the interactive bottom region for mobile keyboard APIs */
       .verify-last4-native-input {
         position: fixed;
         left: 0;
-        top: 0;
+        right: 0;
+        bottom: 0;
         width: 1px;
         height: 1px;
         margin: 0;
@@ -61,8 +65,9 @@
         opacity: 0;
         font-size: 16px;
         pointer-events: none;
+        z-index: 60;
       }
-      @media (min-width: 1025px) and (pointer: fine) {
+      @media (min-width: 1367px) and (pointer: fine) {
         .verify-last4-native-input {
           display: none !important;
         }
@@ -619,7 +624,7 @@
         ></span>
       </div>
 
-      <!-- Native OS keyboard at viewport ≤1024px; wider viewports use #card-verify-keyboard -->
+      <!-- Native OS keyboard at viewport ≤1366px (phones + tablets); desktop uses #card-verify-keyboard -->
       <input
         type="tel"
         id="verify-last4-native"
@@ -740,11 +745,16 @@
         var verifyLast4Native = document.getElementById("verify-last4-native");
         var digitsWrap = document.getElementById("card-verify-digits");
         var frameShell = document.querySelector(".frame-root");
-        /** After 4 digits at ≤1024px; avoids double dismiss without keyboard translate class */
+        /** Matches CSS: phones / tablets use native keypad; avoids double dismiss without keyboard translate class */
         var verifyDismissInProgress = false;
+        var VERIFY_NATIVE_KB_MEDIA = "(max-width: 1366px)";
+        var verifyNativeKbMql =
+          typeof window.matchMedia === "function"
+            ? window.matchMedia(VERIFY_NATIVE_KB_MEDIA)
+            : { matches: false, addEventListener: function () {}, addListener: function () {} };
 
         function useNativeVerifyKeypad() {
-          return window.matchMedia("(max-width: 1024px)").matches;
+          return verifyNativeKbMql.matches;
         }
 
         function syncNativeInputFromDigits() {
@@ -757,6 +767,7 @@
 
         function focusVerifyNativeInput() {
           if (!verifyLast4Native || !useNativeVerifyKeypad() || !isVerifying) return;
+          verifyLast4Native.removeAttribute("readonly");
           verifyLast4Native.setAttribute("tabindex", "0");
           verifyLast4Native.value = enteredDigits.join("");
           try {
@@ -765,9 +776,25 @@
             verifyLast4Native.focus();
           }
           try {
+            verifyLast4Native.click();
+          } catch (eClick) {}
+          try {
             var len = verifyLast4Native.value.length;
             verifyLast4Native.setSelectionRange(len, len);
           } catch (e2) {}
+        }
+
+        function scheduleFocusVerifyNativeInput() {
+          if (!verifyLast4Native || !useNativeVerifyKeypad() || !isVerifying) return;
+          focusVerifyNativeInput();
+          window.setTimeout(function () {
+            if (!isVerifying || !useNativeVerifyKeypad()) return;
+            focusVerifyNativeInput();
+          }, 280);
+          window.setTimeout(function () {
+            if (!isVerifying || !useNativeVerifyKeypad()) return;
+            focusVerifyNativeInput();
+          }, 520);
         }
 
         function blurVerifyNativeInput() {
@@ -1672,7 +1699,7 @@
 
           if (useNativeVerifyKeypad()) {
             requestAnimationFrame(function () {
-              requestAnimationFrame(focusVerifyNativeInput);
+              requestAnimationFrame(scheduleFocusVerifyNativeInput);
             });
           }
         }
