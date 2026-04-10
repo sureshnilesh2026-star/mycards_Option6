@@ -494,7 +494,11 @@
           clearTimeout(keyboardShiftDebounceTimer);
           /* Longer debounce on login: keyboard + visualViewport fire many events; batch to one smooth target. */
           var delay =
-            isMobileInputFocused && !isOtpInputFocused ? 110 : 72;
+            isMobileInputFocused && !isOtpInputFocused
+              ? 110
+              : isOtpInputFocused
+              ? 110
+              : 72;
           keyboardShiftDebounceTimer = window.setTimeout(function () {
             keyboardShiftDebounceTimer = null;
             updateKeyboardShift();
@@ -561,6 +565,16 @@
           if (!isOtpInputFocused) resetKeyboardShift();
         });
 
+        otpRaw.addEventListener("pointerdown", function () {
+          if (document.activeElement !== otpRaw) {
+            try {
+              otpRaw.focus({ preventScroll: true });
+            } catch (e) {
+              otpRaw.focus();
+            }
+          }
+        });
+
         otpRaw.addEventListener("focus", function () {
           isOtpInputFocused = true;
           if (!otpSheetSlidingIn) {
@@ -578,17 +592,18 @@
           window.visualViewport.addEventListener("scroll", scheduleKeyboardShift);
         }
 
-        function focusOtpFieldForKeyboard() {
+        function focusOtpFieldForKeyboard(useClickFallback) {
           try {
             otpRaw.focus({ preventScroll: true });
           } catch (_) {
             otpRaw.focus();
           }
-          // Some mobile browsers require a synthetic click before showing keyboard.
-          otpRaw.click();
           var len = otpRaw.value.length;
           if (typeof otpRaw.setSelectionRange === "function") {
             otpRaw.setSelectionRange(len, len);
+          }
+          if (useClickFallback && document.activeElement !== otpRaw) {
+            otpRaw.click();
           }
         }
 
@@ -602,36 +617,44 @@
           otpSheetSlidingIn = true;
           clearTimeout(keyboardShiftDebounceTimer);
           keyboardShiftDebounceTimer = null;
+          if (keyboardShiftRaf) {
+            cancelAnimationFrame(keyboardShiftRaf);
+            keyboardShiftRaf = null;
+          }
+          lastAppliedKeyboardShiftPx = null;
+          isOtpInputFocused = false;
 
           otpSheet.classList.remove("translate-y-full", "opacity-0", "pointer-events-none");
           otpSheet.classList.add("translate-y-0", "opacity-100", "pointer-events-auto");
           otpBackdrop.classList.remove("opacity-0", "pointer-events-none");
           otpBackdrop.classList.add("opacity-100", "pointer-events-auto");
 
-          // Start keyboard open with sheet slide-in (instead of waiting for a tap).
-          isOtpInputFocused = true;
-          focusOtpFieldForKeyboard();
-          requestAnimationFrame(function () {
-            focusOtpFieldForKeyboard();
-          });
-          window.setTimeout(function () {
-            if (document.activeElement !== otpRaw) {
-              focusOtpFieldForKeyboard();
-            }
-          }, 120);
-
-          // Avoid frame lift fighting the sheet slide (removes bounce): shift after sheet transform settles,
-          // then debounced viewport updates handle keyboard resize smoothly.
+          /*
+           * Sheet slides first with no OTP focus — avoids login-keypad → OTP-keypad viewport war
+           * and flicker. After transition, focus once so the sheet sits above a single stable keypad.
+           */
           whenOtpSheetSlideFinishes(function () {
             otpSheetSlidingIn = false;
             if (!otpSheet.classList.contains("translate-y-0")) return;
-            updateKeyboardShift();
-            scheduleKeyboardShift();
+            isOtpInputFocused = true;
+            focusOtpFieldForKeyboard(false);
+            window.requestAnimationFrame(function () {
+              if (document.activeElement !== otpRaw) {
+                focusOtpFieldForKeyboard(true);
+              }
+              updateKeyboardShift();
+              scheduleKeyboardShift();
+            });
           });
         }
 
         function closeOtp() {
           otpSheetSlidingIn = false;
+          try {
+            otpRaw.blur();
+          } catch (e) {
+            /* ignore */
+          }
           isOtpInputFocused = false;
           otpSheet.classList.add("translate-y-full", "opacity-0", "pointer-events-none");
           otpSheet.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
@@ -689,9 +712,11 @@
           otpLabel.classList.add("hidden");
           otpSpinner.classList.remove("hidden");
 
-          // Open OTP sheet immediately in the same tap gesture so keyboard can
-          // appear from the start of the sheet slide-in animation on mobile.
-          openOtp(v.slice(-4));
+          var last4 = v.slice(-4);
+          /* Let the login-field keypad begin closing so OTP sheet + one keypad don’t fight. */
+          window.setTimeout(function () {
+            openOtp(last4);
+          }, 100);
 
           setTimeout(function () {
             otpSpinner.classList.add("hidden");
