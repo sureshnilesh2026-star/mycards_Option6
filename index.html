@@ -292,12 +292,12 @@
       <!-- OTP layer: bottom sheet — flush to frame bottom (height matches login sheet token) -->
       <div
         id="otp-backdrop"
-        class="absolute inset-0 bg-black/25 opacity-0 pointer-events-none transition-opacity duration-300 ease-out z-[45]"
+        class="absolute inset-0 bg-black/25 opacity-0 pointer-events-none transition-opacity duration-[480ms] ease-out z-[45]"
         aria-hidden="true"
       ></div>
       <div
         id="otp-sheet"
-        class="absolute left-0 right-0 bottom-0 h-sheet w-full max-w-full bg-[#fdfeff] rounded-t-[26px] overflow-hidden translate-y-full opacity-0 pointer-events-none transition-transform transition-opacity duration-300 ease-out z-[50]"
+        class="absolute left-0 right-0 bottom-0 h-sheet w-full max-w-full bg-[#fdfeff] rounded-t-[26px] overflow-hidden translate-y-full opacity-0 pointer-events-none transition-transform transition-opacity duration-[480ms] ease-out z-[50]"
         role="dialog"
         aria-modal="true"
         aria-label="Enter OTP"
@@ -466,10 +466,22 @@
         var keyboardShiftDebounceTimer = null;
         /** While true, OTP sheet transform is animating — do not move .frame-root (prevents bounce). */
         var otpSheetSlidingIn = false;
+        /** Login: wait for keyboard, then lift frame — first lift no earlier than this after mobile focus. */
+        var LOGIN_KB_LIFT_DELAY_MS = 300;
+        var LOGIN_FRAME_SHIFT_MS = 360;
+        /** After Get OTP: wait before OTP sheet enters; keeps keyboard on mobile during delay. */
+        var OTP_OPEN_AFTER_GET_OTP_MS = 300;
+        /** OTP sheet slide duration (must match Tailwind duration on #otp-sheet / #otp-backdrop). */
+        var OTP_SHEET_ENTER_MS = 480;
+        var mobileFocusAt = 0;
+        var loginKbLiftPrimed = false;
+        /** Skip resetKeyboardShift on mobile blur while OTP sheet is being opened from Get OTP. */
+        var suppressMobileBlurReset = false;
 
         function resetKeyboardShift() {
           clearTimeout(keyboardShiftDebounceTimer);
           keyboardShiftDebounceTimer = null;
+          loginKbLiftPrimed = false;
           if (!frameRoot) return;
           frameRoot.style.transform = "";
           frameRoot.style.transition = "";
@@ -477,10 +489,17 @@
         function scheduleKeyboardShift() {
           if (otpSheetSlidingIn) return;
           clearTimeout(keyboardShiftDebounceTimer);
+          var delay = 100;
+          if (isMobileInputFocused && !isOtpInputFocused && !loginKbLiftPrimed) {
+            delay = Math.max(50, LOGIN_KB_LIFT_DELAY_MS - (Date.now() - mobileFocusAt));
+          }
           keyboardShiftDebounceTimer = window.setTimeout(function () {
             keyboardShiftDebounceTimer = null;
+            if (isMobileInputFocused && !isOtpInputFocused) {
+              loginKbLiftPrimed = true;
+            }
             updateKeyboardShift();
-          }, 100);
+          }, delay);
         }
 
         function updateKeyboardShift() {
@@ -498,7 +517,7 @@
           var shiftY = Math.min(overlap, 420);
           frameRoot.style.transition = isOtpInputFocused
             ? "transform 280ms ease-out"
-            : "transform 180ms ease-out";
+            : "transform " + LOGIN_FRAME_SHIFT_MS + "ms ease-out";
           frameRoot.style.transform = shiftY > 0 ? "translateY(-" + Math.round(shiftY) + "px)" : "";
           window.scrollTo(0, 0);
         }
@@ -516,17 +535,27 @@
             finish();
           }
           otpSheet.addEventListener("transitionend", onEnd);
-          window.setTimeout(finish, 340);
+          window.setTimeout(finish, OTP_SHEET_ENTER_MS + 80);
         }
 
         mobile.addEventListener("focus", function () {
           isMobileInputFocused = true;
-          window.setTimeout(updateKeyboardShift, 50);
+          loginKbLiftPrimed = false;
+          mobileFocusAt = Date.now();
+          clearTimeout(keyboardShiftDebounceTimer);
+          keyboardShiftDebounceTimer = window.setTimeout(function () {
+            keyboardShiftDebounceTimer = null;
+            loginKbLiftPrimed = true;
+            updateKeyboardShift();
+          }, LOGIN_KB_LIFT_DELAY_MS);
         });
 
         mobile.addEventListener("blur", function () {
           isMobileInputFocused = false;
-          if (!isOtpInputFocused) resetKeyboardShift();
+          loginKbLiftPrimed = false;
+          if (!isOtpInputFocused && !suppressMobileBlurReset) {
+            resetKeyboardShift();
+          }
         });
 
         otpRaw.addEventListener("focus", function () {
@@ -592,6 +621,7 @@
           // then debounced viewport updates handle keyboard resize smoothly.
           whenOtpSheetSlideFinishes(function () {
             otpSheetSlidingIn = false;
+            suppressMobileBlurReset = false;
             if (!otpSheet.classList.contains("translate-y-0")) return;
             updateKeyboardShift();
             scheduleKeyboardShift();
@@ -600,6 +630,7 @@
 
         function closeOtp() {
           otpSheetSlidingIn = false;
+          suppressMobileBlurReset = false;
           isOtpInputFocused = false;
           otpSheet.classList.add("translate-y-full", "opacity-0", "pointer-events-none");
           otpSheet.classList.remove("translate-y-0", "opacity-100", "pointer-events-auto");
@@ -647,9 +678,8 @@
           }
 
           getOtpFlowActive = true;
-          mobile.blur();
-          resetKeyboardShift();
-          isMobileInputFocused = false;
+          suppressMobileBlurReset = true;
+          /* Keep mobile focus + frame lift so keyboard stays up; OTP opens after delay. */
 
           setInfoText(defaultInfoText, false);
           btnOtp.disabled = true;
@@ -657,9 +687,9 @@
           otpLabel.classList.add("hidden");
           otpSpinner.classList.remove("hidden");
 
-          // Open OTP sheet immediately in the same tap gesture so keyboard can
-          // appear from the start of the sheet slide-in animation on mobile.
-          openOtp(v.slice(-4));
+          window.setTimeout(function () {
+            openOtp(v.slice(-4));
+          }, OTP_OPEN_AFTER_GET_OTP_MS);
 
           setTimeout(function () {
             otpSpinner.classList.add("hidden");
