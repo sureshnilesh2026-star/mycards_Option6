@@ -850,6 +850,10 @@
         transform: translate3d(0, 0, 0);
         transition: transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
       }
+      .infinia_content .credit_limit svg > path[fill="black"],
+      .infinia_content .credit_limit svg > path[fill="#7B8995"] {
+        fill: #ffffff;
+      }
       /* Card settings — tile grid, then “Card Settings” row under icons */
       .frame-root__card-settings {
         flex-shrink: 0;
@@ -3104,7 +3108,7 @@
         if (!ctx) return;
 
         var frameCount = 65;
-        var imageBasePath = "animation/infinia_card/";
+        var imageBasePath = "assets/animation/infinia_card/";
         var frameZoom = 1.12;
         var frameYOffsetPx = -80;
         var images = new Array(frameCount);
@@ -3362,7 +3366,7 @@
         if (!ctx) return;
 
         var frameCount = 65;
-        var imageBasePath = "animation/millennia_card/";
+        var imageBasePath = "assets/animation/millennia_card/";
         var frameZoom = 1.12;
         var frameYOffsetPx = -80;
         var images = new Array(frameCount);
