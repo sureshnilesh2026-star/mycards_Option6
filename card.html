@@ -3677,6 +3677,7 @@
 
         var touchStartX = 0;
         var touchStartY = 0;
+        var lastTouchY = 0;
         var startScrollLeft = 0;
         var hasActiveTouch = false;
         var lockHorizontal = false;
@@ -3687,6 +3688,36 @@
         var panes = Array.prototype.slice.call(
           mainContent.querySelectorAll(".infinia_content, .millenia_content")
         );
+
+        function getPaneScrollContainer(target) {
+          var pane = target ? target.closest(".infinia_content, .millenia_content") : null;
+          return pane ? pane.querySelector(".frame-root__scrollable") : null;
+        }
+
+        function driveVerticalSwipe(target, deltaY) {
+          if (!deltaY) return false;
+
+          var scrollContainer = getPaneScrollContainer(target);
+          if (!scrollContainer) return false;
+
+          var scaledDeltaY = deltaY * 3.5;
+          var consumed = false;
+
+          if (typeof scrollContainer.__cardIntroAdvanceBy === "function") {
+            consumed = scrollContainer.__cardIntroAdvanceBy(scaledDeltaY) || consumed;
+          }
+          if (typeof scrollContainer.__cardMaskAdvanceBy === "function") {
+            consumed = scrollContainer.__cardMaskAdvanceBy(scaledDeltaY) || consumed;
+          }
+          if (consumed) {
+            scrollContainer.scrollTop = 0;
+            return true;
+          }
+
+          var previousScrollTop = scrollContainer.scrollTop;
+          scrollContainer.scrollTop = previousScrollTop + deltaY;
+          return scrollContainer.scrollTop !== previousScrollTop;
+        }
 
         function snapToNearestPane() {
           if (!panes.length) return;
@@ -3711,6 +3742,7 @@
             if (!event.touches || event.touches.length !== 1) return;
             touchStartX = event.touches[0].clientX;
             touchStartY = event.touches[0].clientY;
+            lastTouchY = touchStartY;
             startScrollLeft = mainContent.scrollLeft;
             hasActiveTouch = true;
             lockHorizontal = false;
@@ -3724,6 +3756,7 @@
 
             var dx = event.touches[0].clientX - touchStartX;
             var dy = event.touches[0].clientY - touchStartY;
+            var stepDeltaY = lastTouchY - event.touches[0].clientY;
 
             if (!lockHorizontal && !lockVertical) {
               if (Math.abs(dx) - Math.abs(dy) > AXIS_LOCK_THRESHOLD) {
@@ -3733,10 +3766,23 @@
               }
             }
 
-            if (!lockHorizontal) return;
+            if (lockVertical) {
+              if (driveVerticalSwipe(activeTarget || event.currentTarget, stepDeltaY)) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+              lastTouchY = event.touches[0].clientY;
+              return;
+            }
+
+            if (!lockHorizontal) {
+              lastTouchY = event.touches[0].clientY;
+              return;
+            }
 
             event.preventDefault();
             mainContent.scrollLeft = startScrollLeft - dx;
+            lastTouchY = event.touches[0].clientY;
         }
 
         function onTouchEnd() {
@@ -3747,6 +3793,7 @@
             lockHorizontal = false;
             lockVertical = false;
             activeTarget = null;
+            lastTouchY = 0;
         }
 
         function onTouchCancel() {
@@ -3757,6 +3804,7 @@
             lockHorizontal = false;
             lockVertical = false;
             activeTarget = null;
+            lastTouchY = 0;
         }
 
         function onWheel(event) {
@@ -3975,6 +4023,10 @@
             applyIntroProgress();
             if (scrollContainer) scrollContainer.scrollTop = 0;
             return true;
+          }
+
+          if (scrollContainer) {
+            scrollContainer.__cardIntroAdvanceBy = advanceBy;
           }
 
           function onWheel(event) {
@@ -4239,6 +4291,8 @@
             return true;
           }
 
+          scrollContainer.__cardIntroAdvanceBy = advanceBy;
+
           function onWheel(event) {
             if (advanceBy(event.deltaY)) {
               event.preventDefault();
@@ -4371,6 +4425,8 @@
 
           return false;
         }
+
+        scrollEl.__cardMaskAdvanceBy = updateMaskByDelta;
 
         scrollEl.addEventListener(
           "wheel",
