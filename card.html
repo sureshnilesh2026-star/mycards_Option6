@@ -3925,6 +3925,9 @@
           var introDistance = Math.max(frameCount * 20, 1200);
           var touchY = null;
           var touchX = null;
+          var touchStartX = null;
+          var touchStartY = null;
+          var gestureDirection = null;
           var hasGSAP = !!window.gsap;
 
           if (hasGSAP) {
@@ -3984,16 +3987,29 @@
             if (event.touches.length !== 1) return;
             touchX = event.touches[0].clientX;
             touchY = event.touches[0].clientY;
+            touchStartX = touchX;
+            touchStartY = touchY;
+            gestureDirection = null;
           }
 
           function onTouchMove(event) {
             if (touchY === null || touchX === null || event.touches.length !== 1) return;
             var currentX = event.touches[0].clientX;
             var currentY = event.touches[0].clientY;
+            
+            if (!gestureDirection) {
+              var dx = Math.abs(currentX - touchStartX);
+              var dy = Math.abs(currentY - touchStartY);
+              if (dx > 5 || dy > 5) {
+                gestureDirection = dy > dx ? "vertical" : "horizontal";
+              }
+            }
+            if (gestureDirection === "horizontal") return;
+
             var deltaX = touchX - currentX;
             var deltaY = touchY - currentY;
             var isVerticalGesture = Math.abs(deltaY) > Math.abs(deltaX);
-            if (isVerticalGesture && advanceBy(deltaY)) {
+            if ((gestureDirection === "vertical" || isVerticalGesture) && advanceBy(deltaY * 3.5)) {
               event.preventDefault();
             }
             touchX = currentX;
@@ -4003,6 +4019,7 @@
           function onTouchEnd() {
             touchX = null;
             touchY = null;
+            gestureDirection = null;
           }
 
           var wheelOptions = { passive: false };
@@ -4171,6 +4188,9 @@
           var introDistance = Math.max(frameCount * 20, 1200);
           var touchY = null;
           var touchX = null;
+          var touchStartX = null;
+          var touchStartY = null;
+          var gestureDirection = null;
           var hasGSAP = !!window.gsap;
 
           if (hasGSAP) {
@@ -4229,16 +4249,29 @@
             if (event.touches.length !== 1) return;
             touchX = event.touches[0].clientX;
             touchY = event.touches[0].clientY;
+            touchStartX = touchX;
+            touchStartY = touchY;
+            gestureDirection = null;
           }
 
           function onTouchMove(event) {
             if (touchY === null || touchX === null || event.touches.length !== 1) return;
             var currentX = event.touches[0].clientX;
             var currentY = event.touches[0].clientY;
+            
+            if (!gestureDirection) {
+              var dx = Math.abs(currentX - touchStartX);
+              var dy = Math.abs(currentY - touchStartY);
+              if (dx > 5 || dy > 5) {
+                gestureDirection = dy > dx ? "vertical" : "horizontal";
+              }
+            }
+            if (gestureDirection === "horizontal") return;
+
             var deltaX = touchX - currentX;
             var deltaY = touchY - currentY;
             var isVerticalGesture = Math.abs(deltaY) > Math.abs(deltaX);
-            if (isVerticalGesture && advanceBy(deltaY)) {
+            if ((gestureDirection === "vertical" || isVerticalGesture) && advanceBy(deltaY * 3.5)) {
               event.preventDefault();
             }
             touchX = currentX;
@@ -4248,6 +4281,7 @@
           function onTouchEnd() {
             touchX = null;
             touchY = null;
+            gestureDirection = null;
           }
 
           interactionTarget.addEventListener("wheel", onWheel, { passive: false });
@@ -4293,6 +4327,9 @@
         var maskScale = 1;
         var touchY = null;
         var touchX = null;
+        var touchStartX = null;
+        var touchStartY = null;
+        var gestureDirection = null;
 
         function applyMaskScale() {
           animatedCards.forEach(function (card) {
@@ -4353,6 +4390,9 @@
             if (event.touches.length === 1) {
               touchX = event.touches[0].clientX;
               touchY = event.touches[0].clientY;
+              touchStartX = touchX;
+              touchStartY = touchY;
+              gestureDirection = null;
             }
           },
           { passive: true }
@@ -4364,10 +4404,20 @@
             if (touchY === null || touchX === null || event.touches.length !== 1) return;
             var currentX = event.touches[0].clientX;
             var currentY = event.touches[0].clientY;
+            
+            if (!gestureDirection) {
+              var dx = Math.abs(currentX - touchStartX);
+              var dy = Math.abs(currentY - touchStartY);
+              if (dx > 5 || dy > 5) {
+                gestureDirection = dy > dx ? "vertical" : "horizontal";
+              }
+            }
+            if (gestureDirection === "horizontal") return;
+
             var deltaX = touchX - currentX;
             var deltaY = touchY - currentY;
             var isVerticalGesture = Math.abs(deltaY) > Math.abs(deltaX);
-            if (isVerticalGesture && updateMaskByDelta(deltaY)) {
+            if ((gestureDirection === "vertical" || isVerticalGesture) && updateMaskByDelta(deltaY * 3.5)) {
               event.preventDefault();
             }
             touchX = currentX;
@@ -4381,6 +4431,7 @@
           function () {
             touchX = null;
             touchY = null;
+            gestureDirection = null;
           },
           { passive: true }
         );
