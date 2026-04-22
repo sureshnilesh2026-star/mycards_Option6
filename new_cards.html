@@ -47,7 +47,41 @@
       }
 
       .hero-theme {
-        transition: background 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.4s ease;
+        transition: background 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-text-primary,
+      .hero-text-secondary {
+        transition: color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-chip {
+        transition:
+          color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+          background-color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-card-filter-chip-active,
+      .hero-card-filter-chip-default {
+        transition:
+          color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+          background-color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-settings-label {
+        transition: color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-info-gradient {
+        transition: background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-chip-copy {
+        transition: filter 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      #heroSection[data-theme="millennia"] .hero-chip-copy {
+        filter: none;
       }
 
       #heroSection[data-theme="millennia"] {
@@ -71,52 +105,49 @@
         color: #111827;
       }
 
-      .hero-chip-brand-pair img {
+      .hero-chip-brand-slot {
+        position: relative;
+        height: 18px;
+        width: 28px;
+        flex-shrink: 0;
+      }
+
+      .hero-chip-card-millennia,
+      .hero-chip-card-infinia {
+        position: absolute;
+        left: 0;
+        top: 0;
         transition: opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      #heroSection[data-theme="millennia"] .hero-chip-brand-pair .hero-chip-card-infinia,
-      #heroSection[data-theme="infinia"] .hero-chip-brand-pair .hero-chip-card-millennia {
+      .hero-chip-card-millennia {
         opacity: 0;
         pointer-events: none;
       }
 
-      #heroSection[data-theme="millennia"] .hero-chip-brand-pair .hero-chip-card-millennia,
-      #heroSection[data-theme="infinia"] .hero-chip-brand-pair .hero-chip-card-infinia {
+      .hero-chip-card-infinia {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #heroSection[data-theme="millennia"] .hero-chip-card-millennia {
         opacity: 1;
+        pointer-events: auto;
       }
 
-      #heroSection .hero-text-primary,
-      #heroSection .hero-text-secondary {
-        transition: color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      #heroSection[data-theme="millennia"] .hero-chip-card-infinia {
+        opacity: 0;
+        pointer-events: none;
       }
 
-      #heroSection .hero-chip {
-        transition:
-          background 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
-          color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
-          backdrop-filter 0.38s ease;
+      #heroSection[data-theme="infinia"] .hero-chip-card-millennia {
+        opacity: 0;
+        pointer-events: none;
       }
 
-      #heroSection .hero-info-gradient {
-        transition: background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-
-      #heroSection .hero-settings-label {
-        transition: color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-
-      #heroSection .hero-chip-copy {
-        transition: filter 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.38s ease;
-      }
-
-      #heroSection[data-theme="millennia"] .hero-chip-copy {
-        filter: none;
-      }
-
-      .hero-card-filter-chip-active,
-      .hero-card-filter-chip-default {
-        transition: background-color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      #heroSection[data-theme="infinia"] .hero-chip-card-infinia {
+        opacity: 1;
+        pointer-events: auto;
       }
 
       #heroSection[data-theme="millennia"] .hero-settings-label {
@@ -186,34 +217,31 @@
         --intro-info-shift: 0px;
       }
 
-      .amount-pair {
+      .theme-amount-pair {
         display: inline-grid;
-        justify-items: center;
-        vertical-align: baseline;
-      }
-
-      #contentFrame .amount-pair {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
         justify-items: start;
       }
 
-      .amount-pair > .amount-m,
-      .amount-pair > .amount-i {
+      .theme-amount-pair--center {
+        justify-items: center;
+      }
+
+      .theme-amount-pair .amount-m,
+      .theme-amount-pair .amount-i {
         grid-area: 1 / 1;
         transition: opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      #pageScroll[data-theme="millennia"] .amount-pair > .amount-i {
+      #pageScroll[data-theme="millennia"] .theme-amount-pair .amount-i,
+      #pageScroll[data-theme="infinia"] .theme-amount-pair .amount-m {
         opacity: 0;
         pointer-events: none;
       }
 
-      #pageScroll[data-theme="infinia"] .amount-pair > .amount-m {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      #pageScroll[data-theme="millennia"] .amount-pair > .amount-m,
-      #pageScroll[data-theme="infinia"] .amount-pair > .amount-i {
+      #pageScroll[data-theme="millennia"] .theme-amount-pair .amount-m,
+      #pageScroll[data-theme="infinia"] .theme-amount-pair .amount-i {
         opacity: 1;
       }
 
@@ -222,7 +250,9 @@
         --card-settings-content-shift: 0px;
         --card-settings-card-shift: 0px;
         height: calc(540px + var(--card-settings-panel-space));
-        transition: height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition:
+          height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+          background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .hero-cards-viewport {
@@ -251,11 +281,11 @@
       }
 
       .hero-settings-toggle[aria-expanded="true"] .hero-settings-arrow {
-        transform: scaleY(1);
+        transform: rotate(-90deg) scaleY(1);
       }
 
       .hero-settings-toggle[aria-expanded="false"] .hero-settings-arrow {
-        transform: scaleY(-1);
+        transform: rotate(-90deg) scaleY(-1);
       }
 
       #cardSettingsPanel {
@@ -285,34 +315,51 @@
         transform: translateY(-8px);
       }
 
-      .card-settings-art-pair {
+      .card-settings-art-wrap {
         position: relative;
+        height: 140px;
         width: 100%;
         max-width: 326px;
-        height: 140px;
       }
 
-      #cardSettingsPanel .card-settings-art-pair img {
+      #cardSettingsPanel .card-settings-art-millennia,
+      #cardSettingsPanel .card-settings-art-infinia {
         position: absolute;
         left: 50%;
         top: 0;
-        transform: translateX(-50%);
         height: 140px;
         width: 100%;
         max-width: 326px;
+        transform: translateX(-50%);
         object-fit: contain;
+        object-position: top center;
         transition: opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia,
+      #cardSettingsPanel .card-settings-art-millennia,
+      #cardSettingsPanel .card-settings-art-infinia {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia {
+        opacity: 0;
+        pointer-events: none;
+      }
+
       #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-millennia {
         opacity: 0;
         pointer-events: none;
       }
 
-      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia,
       #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-infinia {
         opacity: 1;
+        pointer-events: auto;
       }
 
       #heroInfoLayer {
@@ -362,7 +409,12 @@
       <div
         class="relative h-[100dvh] w-[360px] overflow-hidden bg-white md:h-[844px] md:shadow-[0_24px_64px_rgba(15,23,42,0.18)]"
       >
-        <main id="pageScroll" data-theme="millennia" class="hide-scrollbar absolute inset-0 overflow-y-auto overflow-x-hidden pb-[72px]">
+        <main
+          id="pageScroll"
+          data-theme="millennia"
+          class="hide-scrollbar absolute inset-0 overflow-y-auto overflow-x-hidden"
+          style="padding-bottom: 80px;"
+        >
           <section id="heroSection" data-theme="millennia" class="hero-theme relative overflow-hidden">
             <div
               id="cardsViewport"
@@ -488,7 +540,7 @@
                   <p class="hero-text-primary text-[10px] font-normal uppercase leading-[1.4]">AVAILABLE CREDIT LIMIT</p>
                   <div class="flex flex-col items-center">
                     <p class="hero-text-primary text-[24px] font-bold leading-[1.2]">
-                      <span class="amount-pair">
+                      <span class="theme-amount-pair theme-amount-pair--center">
                         <span class="amount-m">₹56,422</span><span class="amount-i">₹75,500</span>
                       </span>
                     </p>
@@ -497,34 +549,34 @@
                 </div>
 
                 <div class="hero-chip flex items-center gap-[8px] rounded-[8px] pl-[4px] pr-[8px] py-[4px]">
-                  <div class="hero-chip-brand-pair relative h-[18px] w-[28px] shrink-0">
+                  <div class="hero-chip-brand-slot">
                     <img
                       alt="Mastercard"
-                      class="hero-chip-card-millennia absolute left-0 top-0 h-[18px] w-[28px] object-contain object-left"
+                      class="hero-chip-card-millennia h-[18px] w-[28px] object-contain object-left"
                       src="assets/master_card_logo.png"
                     />
                     <img
                       alt="Visa"
-                      class="hero-chip-card-infinia absolute left-0 top-0 h-[18px] w-[24px] object-contain"
-                      src="http://localhost:3845/assets/893599c8007be11ed78125b2718d66129233c9ff.svg"
+                      class="hero-chip-card-infinia h-[18px] w-[24px] object-contain"
+                      src="assets/6566b437c54ef9890f06c659a00acc2afaa446cb.svg"
                     />
                   </div>
                   <p class="text-[12px] font-medium leading-[1.2]">•••• •••• •••• 9132</p>
                   <img
                     alt="Copy"
                     class="hero-chip-copy h-[16px] w-[16px] opacity-90"
-                    src="http://localhost:3845/assets/8d1970c434dda248f0b5da3cd7e8667e4daa10fc.svg"
+                    src="assets/hero-chip-copy.svg"
                   />
                 </div>
               </div>
 
               <div class="flex flex-col items-center gap-0">
                 <div id="cardSettingsPanel" data-open="true" aria-hidden="false">
-                  <div class="card-settings-art-pair">
+                  <div class="card-settings-art-wrap">
                     <img
                       alt="Card actions"
                       class="card-settings-art-millennia"
-                      src="http://localhost:3845/assets/e2f0d2eb440d96cf65b1b8df646b97b0456fe017.svg"
+                      src="assets/card-settings-tiles-millenia.svg"
                     />
                     <img
                       alt="Card actions"
@@ -544,7 +596,7 @@
                   <img
                     alt=""
                     class="hero-settings-arrow h-[12px] w-[12px]"
-                    src="http://localhost:3845/assets/57b2eafa09ba55a990d943b59f61cea19802baea.svg"
+                    src="assets/content3-benefit-chevron.svg"
                   />
                 </button>
               </div>
@@ -560,49 +612,8 @@
             />
 
             <div class="space-y-[16px]">
-              <div id="content1" class="grid grid-cols-4 gap-[0px] rounded-[12px]">
-                <div class="flex flex-col items-center justify-center gap-[4px] rounded-[12px] py-[12px]">
-                  <div class="rounded-full bg-[#e6ddfe] p-[12px]">
-                    <img
-                      alt=""
-                      class="h-[20px] w-[20px]"
-                      src="http://localhost:3845/assets/1d6d5a6f5386278f41c2a29e30b7434b8c60149d.svg"
-                    />
-                  </div>
-                  <p class="text-[11px] font-medium leading-[1.4] text-[#030612]">Statement</p>
-                </div>
-                <div class="flex flex-col items-center justify-center gap-[4px] rounded-[12px] py-[12px]">
-                  <div class="rounded-full bg-[#fef0b0] p-[12px]">
-                    <img
-                      alt=""
-                      class="h-[20px] w-[20px]"
-                      src="http://localhost:3845/assets/14058c525fbe3132b29784c883b983d448077939.svg"
-                    />
-                  </div>
-                  <p class="text-[11px] font-medium leading-[1.4] text-[#030612]">Rewards</p>
-                </div>
-                <div class="flex flex-col items-center justify-center gap-[4px] rounded-[12px] py-[12px]">
-                  <div class="rounded-full bg-[#fbdcf6] p-[12px]">
-                    <div class="relative h-[20px] w-[20px] overflow-hidden">
-                      <img
-                        alt=""
-                        class="absolute left-[1px] top-[1px] h-[18px] w-[18px]"
-                        src="http://localhost:3845/assets/94dd6e41b55a1d64225c754c00ac2d603ec80962.svg"
-                      />
-                    </div>
-                  </div>
-                  <p class="text-[11px] font-medium leading-[1.4] text-[#030612]">EMIs</p>
-                </div>
-                <div class="flex flex-col items-center justify-center gap-[4px] rounded-[12px] py-[12px]">
-                  <div class="rounded-full bg-[#c7f9d6] p-[12px]">
-                    <img
-                      alt=""
-                      class="h-[20px] w-[20px]"
-                      src="http://localhost:3845/assets/1297069e5351fe50bde5e3fc9f3103d600f7d723.svg"
-                    />
-                  </div>
-                  <p class="text-[11px] font-medium leading-[1.4] text-[#030612]">Services</p>
-                </div>
+              <div id="content1" class="flex justify-center overflow-hidden rounded-[12px]">
+                <img alt="" class="h-auto w-full max-w-[352px]" src="assets/content-options-frame.svg" />
               </div>
 
               <div id="content2" class="space-y-[8px]">
@@ -610,7 +621,7 @@
                   <div class="flex items-center justify-between">
                     <div>
                       <p class="text-[20px] font-bold leading-[1.2] text-[#333333]">
-                        <span class="amount-pair">
+                        <span class="theme-amount-pair">
                           <span class="amount-m">₹46,578</span><span class="amount-i">₹70,000</span>
                         </span>
                       </p>
@@ -626,7 +637,7 @@
                     <div class="min-w-0 flex-1">
                       <p class="text-[10px] font-normal uppercase leading-[1.4] text-[#333333]">TOTAL OUTSTANDING</p>
                       <p class="mt-[4px] text-[16px] font-bold leading-[1.2] text-[#333333]">
-                        <span class="amount-pair">
+                        <span class="theme-amount-pair">
                           <span class="amount-m">₹46,578.56</span><span class="amount-i">₹65,500.00</span>
                         </span>
                       </p>
@@ -636,14 +647,14 @@
                       <p class="text-[10px] font-normal uppercase leading-[1.4] text-[#333333]">TOTAL UNBILLED</p>
                       <div class="mt-[4px] flex items-center justify-between">
                         <p class="text-[16px] font-bold leading-[1.2] text-[#333333]">
-                          <span class="amount-pair">
+                          <span class="theme-amount-pair">
                             <span class="amount-m">₹16,569.00</span><span class="amount-i">₹4,500.00</span>
                           </span>
                         </p>
                         <img
                           alt=""
                           class="h-[16px] w-[16px] rotate-180"
-                          src="http://localhost:3845/assets/42645703048c3851ebe4bbee12fb9db80486783e.svg"
+                          src="assets/content3-benefit-chevron.svg"
                         />
                       </div>
                     </div>
@@ -658,7 +669,7 @@
                     <img
                       alt=""
                       class="absolute left-[7px] top-[7px] h-[43px] w-[53px] rotate-[11.65deg]"
-                      src="http://localhost:3845/assets/4cf76b9759bd6754cc64139ad0eaee2ee95dbe17.png"
+                      src="assets/explore-card1.png"
                     />
                     <p class="absolute bottom-[12px] left-[12px] w-[79px] text-[11px] font-bold leading-[1.2] text-[#333333]">
                       Get The Best Card for UPI
@@ -668,7 +679,7 @@
                     <img
                       alt=""
                       class="absolute left-[-33px] top-[-7px] h-[93px] w-[129px] -scale-y-100 rotate-180 object-cover"
-                      src="http://localhost:3845/assets/7d27ddca79e3ac5d4136c8b260c949c98caa4124.png"
+                      src="assets/explore-card2.png"
                     />
                     <p class="absolute bottom-[12px] left-[12px] w-[84px] text-[11px] font-bold leading-[1.2] text-[#333333]">
                       Fixed Deposits
@@ -681,7 +692,7 @@
                     <img
                       alt=""
                       class="absolute left-[-16px] top-[-9px] h-[98px] w-[98px] rotate-[5.63deg] object-cover"
-                      src="http://localhost:3845/assets/dfb28b05b18e100cab2cca16cf66b840a2cf082f.png"
+                      src="assets/explore-card3.png"
                     />
                     <p class="absolute bottom-[12px] left-[12px] w-[84px] text-[11px] font-bold leading-[1.2] text-[#333333]">
                       Get Instant Personal Loan
@@ -694,7 +705,7 @@
                     <img
                       alt=""
                       class="absolute left-[-6px] top-[-18px] h-[122px] w-[135px] rotate-[151.35deg] -scale-y-100 object-contain"
-                      src="http://localhost:3845/assets/69f8724452662e0a85a7c7984883685d3b73cfa1.png"
+                      src="assets/explore-card4.png"
                     />
                     <p class="absolute bottom-[12px] left-[12px] w-[84px] text-[11px] font-bold leading-[1.2] text-[#333333]">
                       Invest with SmartWealth
@@ -720,7 +731,7 @@
                   <div class="flex items-center justify-between">
                     <div class="flex items-start gap-[12px]">
                       <div class="relative h-[40px] w-[40px] rounded-[12px] border border-[#ebf4ff] bg-white">
-                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="http://localhost:3845/assets/2c5806dadf50bb9bb11bdf3abdf004c5bbbd8874.png" />
+                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="assets/texture-tatanue.png" />
                       </div>
                       <div>
                         <p class="text-[14px] font-normal leading-[1.4] text-[#333333]">Amazon</p>
@@ -733,7 +744,7 @@
                   <div class="flex items-center justify-between">
                     <div class="flex items-start gap-[12px]">
                       <div class="relative h-[40px] w-[40px] rounded-[12px] border border-[#ebf4ff] bg-white">
-                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="http://localhost:3845/assets/a0997a5d576b1947a4f4fefedbe1269bc6084ace.png" />
+                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="assets/emi-playstore.png" />
                       </div>
                       <div>
                         <p class="text-[14px] font-normal leading-[1.4] text-[#333333]">Google Playstore</p>
@@ -746,7 +757,7 @@
                   <div class="flex items-center justify-between">
                     <div class="flex items-start gap-[12px]">
                       <div class="relative h-[40px] w-[40px] rounded-[12px] border border-[#ebf4ff] bg-white">
-                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="http://localhost:3845/assets/e380bfc993b3d00a8dad94b5057c22489f060bfb.png" />
+                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="assets/emi-mcd.png" />
                       </div>
                       <div>
                         <p class="text-[14px] font-normal leading-[1.4] text-[#333333]">McDonald's</p>
@@ -759,7 +770,7 @@
                   <div class="flex items-center justify-between">
                     <div class="flex items-start gap-[12px]">
                       <div class="relative h-[40px] w-[40px] rounded-[12px] border border-[#ebf4ff] bg-white">
-                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="http://localhost:3845/assets/38eae61f7d7097ada92c9b87757a9aa8a7d6d3da.png" />
+                        <img alt="" class="absolute left-1/2 top-1/2 h-[24px] w-[24px] -translate-x-1/2 -translate-y-1/2" src="assets/card-swiggy.png" />
                       </div>
                       <div>
                         <p class="text-[14px] font-normal leading-[1.4] text-[#333333]">Swiggy</p>
@@ -777,18 +788,11 @@
                   <p class="text-[12px] font-bold leading-none text-[#1c3fca]">View all</p>
                 </div>
                 <div class="hide-scrollbar -mx-[16px] flex gap-[16px] overflow-x-auto overflow-y-visible px-[16px]">
-                  <div class="relative h-[183px] w-[268px] shrink-0 overflow-hidden rounded-[16px] bg-[#c1dcff]">
-                    <p class="absolute left-[20px] top-[20px] font-open text-[20px] font-bold leading-normal text-black">₹5000 Off</p>
-                    <p class="absolute left-[20px] top-[47px] w-[120px] font-open text-[14px] font-normal leading-normal text-black">
-                      on apple watches
-                    </p>
-                    <img alt="" class="absolute left-[36px] top-[-17px] h-[234px] w-[234px] rotate-[53.05deg] object-cover mix-blend-multiply" src="http://localhost:3845/assets/dc63b6a2f8bb823dc8e93938b4903eecd237c5b5.png" />
-                    <img alt="" class="absolute left-[8px] top-[127px] h-[35px] w-[62px]" src="http://localhost:3845/assets/99b6aea2ec48e1e4c0096be06f73d6b0667ced2d.png" />
+                  <div class="relative h-[183px] w-[268px] shrink-0 overflow-hidden rounded-[16px] bg-[#d5e5f8]">
+                    <img alt="" class="h-full w-full object-cover" src="assets/great-deal-card-watch.png" />
                   </div>
-                  <div class="relative h-[183px] w-[268px] shrink-0 overflow-hidden rounded-[16px] bg-[#90dfe7]">
-                    <img alt="" class="absolute left-[-10px] top-0 h-[277px] w-[417px] object-cover" src="http://localhost:3845/assets/4b9d49b0e06a04916b500ede089a5a4f3f1f5ca4.png" />
-                    <p class="absolute left-[21px] top-[20px] font-open text-[20px] font-bold leading-normal text-black">Headphones</p>
-                    <p class="absolute left-[21px] top-[47px] font-open text-[14px] font-normal leading-normal text-black">starting ₹500</p>
+                  <div class="relative h-[183px] w-[268px] shrink-0 overflow-hidden rounded-[16px] bg-[#79d8df]">
+                    <img alt="" class="h-full w-full object-cover" src="assets/great-deal-card-headphones-final.png" />
                   </div>
                 </div>
               </div>
@@ -803,7 +807,7 @@
                     <div class="space-y-[16px] text-center">
                       <p class="text-left text-[12px] font-medium leading-normal text-[#5bbc65]">8 MAY - 8 JUL</p>
                       <div class="flex justify-center">
-                        <img alt="" class="h-[94px] w-[112px] object-contain" src="http://localhost:3845/assets/df39bd77979bd22fb766c707cd8d731d0b2fb888.png" />
+                        <img alt="" class="h-[94px] w-[112px] object-contain" src="assets/content3-benefit-rewards.png" />
                       </div>
                       <div class="space-y-[8px]">
                         <p class="mx-auto w-[114px] text-[14px] font-semibold text-[#333333]">Membership Rewards Points</p>
@@ -820,7 +824,7 @@
                     <div class="space-y-[16px] text-center">
                       <p class="text-left text-[12px] font-medium leading-normal text-[#5bbc65]">8 MAY - 8 JUL</p>
                       <div class="flex justify-center">
-                        <img alt="" class="h-[97px] w-[89px] -scale-y-100 rotate-180 object-contain" src="http://localhost:3845/assets/b83ab57af6e7d292cdc64804c93255e0719ded76.png" />
+                        <img alt="" class="h-[97px] w-[89px] -scale-y-100 rotate-180 object-contain" src="assets/content3-benefit-lounge.png" />
                       </div>
                       <div class="space-y-[8px]">
                         <p class="mx-auto w-[114px] text-[14px] font-semibold text-[#333333]">Complementary Lounge Visits</p>
@@ -837,7 +841,7 @@
                     <div class="space-y-[16px] text-center">
                       <p class="text-left text-[12px] font-medium leading-normal text-[#5bbc65]">8 MAY - 8 JUL</p>
                       <div class="flex justify-center">
-                        <img alt="" class="h-[100px] w-[97px] -scale-y-100 rotate-180 object-contain" src="http://localhost:3845/assets/50b7fb6376adbe0f0ceb64e81642fc72fc4fa8cf.png" />
+                        <img alt="" class="h-[100px] w-[97px] -scale-y-100 rotate-180 object-contain" src="assets/content3-benefit-vip.png" />
                       </div>
                       <div class="space-y-[8px]">
                         <p class="mx-auto w-[114px] text-[14px] font-semibold text-[#333333]">Pass to VIP Air Lounge</p>
@@ -846,7 +850,7 @@
                     </div>
                     <div class="mt-[16px] flex items-center justify-between rounded-[12px] bg-[#ebf4ff] px-[12px] py-[8px] text-[12px] text-[#333333]">
                       <p class="font-normal leading-[1.4]">Claimed</p>
-                      <img alt="" class="h-[16px] w-[16px]" src="http://localhost:3845/assets/d31c8ac622a79ed6d4a8ad3ee4aee36456cbaee0.svg" />
+                      <img alt="" class="h-[16px] w-[16px]" src="assets/content3-benefit-chevron.svg" />
                     </div>
                   </div>
 
@@ -854,7 +858,7 @@
                     <div class="space-y-[16px] text-center">
                       <p class="text-left text-[12px] font-medium leading-normal text-[#5bbc65]">8 MAY - 8 JUL</p>
                       <div class="flex justify-center">
-                        <img alt="" class="h-[97px] w-[92px] object-contain" src="http://localhost:3845/assets/c28b82d5e71b5dd150edcb3c7d5cb5c3ece9e450.png" />
+                        <img alt="" class="h-[97px] w-[92px] object-contain" src="assets/content3-benefit-taj.png" />
                       </div>
                       <div class="space-y-[8px]">
                         <p class="mx-auto w-[114px] text-[14px] font-semibold text-[#333333]">Reward Points + Taj Voucher</p>
@@ -872,57 +876,12 @@
           </section>
         </main>
 
-        <nav
-          class="absolute bottom-0 left-0 right-0 z-30 grid h-[71px] grid-cols-5 bg-white shadow-[0px_-4px_24px_rgba(0,0,0,0.1)]"
-          aria-label="Bottom Navigation"
-        >
-          <div class="relative flex flex-col items-center justify-end gap-[8px] border-t border-[#d0ddfc] py-[12px]">
-            <img alt="" class="h-[20px] w-[20px]" src="http://localhost:3845/assets/306162c22fe2e1dc0fc17ae250bf208f34367842.svg" />
-            <p class="text-center text-[12px] font-semibold leading-[16px] tracking-[-0.12px] text-[#1c3fca]">Home</p>
-          </div>
-          <div class="relative flex flex-col items-center justify-end gap-[8px] border-t border-[#d0ddfc] py-[12px]">
-            <div class="grid h-[20px] w-[20px] grid-cols-3 gap-[2px]">
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-              <span class="h-[4px] w-[4px] rounded-full bg-[#5c6172]"></span>
-            </div>
-            <p class="text-center text-[12px] font-normal leading-[16px] text-[#5c6172]">Services</p>
-          </div>
-          <div class="relative flex items-start justify-center">
-            <div class="absolute -top-[9px] flex h-[80px] w-[72px] items-start justify-center">
-              <img alt="" class="absolute inset-0 h-full w-full" src="http://localhost:3845/assets/7feb27ce0504b764d10dff61daa0ff8069775595.svg" />
-              <img alt="" class="absolute -top-[1px] h-[12px] w-[72px]" src="http://localhost:3845/assets/b899fd003d83ad917383e1a93e95a6de3b8e8184.svg" />
-              <img alt="" class="absolute -top-[1px] h-[13px] w-[72px]" src="http://localhost:3845/assets/bab08d0b23bbd5e2ad7b609d0eb06808da3ef157.svg" />
-              <div
-                class="absolute left-1/2 top-[10px] flex h-[52px] w-[52px] -translate-x-1/2 items-center justify-center overflow-hidden rounded-full border-l-[1.5px] border-t-[1.5px] border-[rgba(255,255,255,0.2)] shadow-[0px_2.603px_43.803px_rgba(51,149,255,0.25)]"
-                style="background-image: linear-gradient(96.340192deg, rgb(16, 24, 58) 0%, rgb(17, 34, 102) 100%);"
-              >
-                <div class="flex items-center gap-[4px]">
-                  <img alt="" class="h-[37px] w-[37px]" src="http://localhost:3845/assets/22fd99add76cc54a93ebb528c0f733a66080ef82.svg" />
-                  <span
-                    class="bg-clip-text text-[13.56px] font-bold tracking-[-0.2712px] text-transparent"
-                    style="background-image: linear-gradient(90deg, rgb(255,255,255) 0%, rgb(255,255,255) 100%), linear-gradient(203.513deg, rgb(88,103,219) 13.937%, rgb(155,89,231) 97.113%);"
-                  >
-                    AskNow
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col items-center justify-end gap-[8px] border-t border-[#d0ddfc] py-[12px]">
-            <img alt="" class="h-[20px] w-[20px]" src="http://localhost:3845/assets/9e6573456a39399423419660c43f77f981acdc8f.svg" />
-            <p class="text-center text-[12px] font-normal leading-[16px] text-[#5c6172]">Help</p>
-          </div>
-          <div class="flex flex-col items-center justify-end gap-[8px] border-t border-[#d0ddfc] py-[12px]">
-            <img alt="" class="h-[20px] w-[20px]" src="http://localhost:3845/assets/574086c73e8a82859fea8579307b4682f4e0c041.svg" />
-            <p class="text-center text-[12px] font-normal leading-[16px] text-[#5c6172]">Track</p>
-          </div>
+        <nav class="absolute bottom-0 left-0 right-0 z-30 overflow-visible" aria-label="Bottom Navigation">
+          <img
+            alt=""
+            class="pointer-events-none absolute left-0 bottom-[-32px] h-auto w-full select-none"
+            src="assets/mycards-bottombar-v2.svg"
+          />
         </nav>
       </div>
     </div>
@@ -1090,14 +1049,36 @@
           if (pageScroll) pageScroll.setAttribute("data-theme", theme);
         }
 
+        function getInitialCardIndexFromUrl() {
+          try {
+            var params = new URLSearchParams(window.location.search || "");
+            var raw = (params.get("card") || "").toLowerCase().trim();
+            if (!raw) return 0;
+            if (raw === "infinia" || raw === "inifnia") return 1;
+            if (raw === "millennia" || raw === "millenia") return 0;
+          } catch (_) {}
+          return 0;
+        }
+
+        function applyInitialCardFromUrl() {
+          if (!cardsViewport || !cardsViewport.clientWidth) return;
+          var initialIndex = getInitialCardIndexFromUrl();
+          activeIndex = initialIndex;
+          cardsViewport.scrollLeft = (cardsViewport.clientWidth || 1) * initialIndex;
+          setTheme(initialIndex);
+        }
+
         function getActiveIndex() {
           var width = cardsViewport.clientWidth || 1;
           return Math.max(0, Math.min(cards.length - 1, Math.round(cardsViewport.scrollLeft / width)));
         }
 
         function updateActiveCard() {
-          activeIndex = getActiveIndex();
-          setTheme(activeIndex);
+          var idx = getActiveIndex();
+          if (idx !== activeIndex) {
+            setTheme(idx);
+          }
+          activeIndex = idx;
           syncIntroMotion();
         }
 
@@ -1246,6 +1227,7 @@
           preloadCard(card);
         });
 
+        applyInitialCardFromUrl();
         updateActiveCard();
         syncIntroMotion();
         setCardSettingsOpen(true);
