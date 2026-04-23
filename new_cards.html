@@ -28,13 +28,23 @@
       };
     </script>
     <style>
+      html {
+        width: 100%;
+        height: 100%;
+      }
+
       html,
       body {
-        height: 100%;
         margin: 0;
         overflow: hidden;
         background: #ffffff;
         -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        width: 100%;
+        min-height: 100%;
+        min-height: 100dvh;
       }
 
       .hide-scrollbar {
@@ -56,9 +66,36 @@
       }
 
       .hero-chip {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .hero-chip-millennia-block {
+        display: flex;
         transition:
           color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
           background-color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .hero-chip-infinia-block {
+        display: none;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .hero-chip-infinia-block svg {
+        display: block;
+        flex-shrink: 0;
+      }
+
+      #heroSection[data-theme="infinia"] .hero-chip-millennia-block {
+        display: none;
+      }
+
+      #heroSection[data-theme="infinia"] .hero-chip-infinia-block {
+        display: flex;
       }
 
       .hero-card-filter-chip-active,
@@ -77,11 +114,9 @@
       }
 
       .hero-chip-copy {
-        transition: filter 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-
-      #heroSection[data-theme="millennia"] .hero-chip-copy {
-        filter: none;
+        display: block;
+        flex-shrink: 0;
+        transition: color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       #heroSection[data-theme="millennia"] {
@@ -100,7 +135,7 @@
         color: #7b8995;
       }
 
-      #heroSection[data-theme="millennia"] .hero-chip {
+      #heroSection[data-theme="millennia"] .hero-chip-millennia-block {
         background: rgba(223, 235, 250, 0.5);
         color: #111827;
       }
@@ -110,22 +145,14 @@
         height: 18px;
         width: 28px;
         flex-shrink: 0;
+        transition: width 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      .hero-chip-card-millennia,
-      .hero-chip-card-infinia {
+      .hero-chip-card-millennia {
         position: absolute;
         left: 0;
         top: 0;
         transition: opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
-
-      .hero-chip-card-millennia {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .hero-chip-card-infinia {
         opacity: 0;
         pointer-events: none;
       }
@@ -135,19 +162,9 @@
         pointer-events: auto;
       }
 
-      #heroSection[data-theme="millennia"] .hero-chip-card-infinia {
-        opacity: 0;
-        pointer-events: none;
-      }
-
       #heroSection[data-theme="infinia"] .hero-chip-card-millennia {
         opacity: 0;
         pointer-events: none;
-      }
-
-      #heroSection[data-theme="infinia"] .hero-chip-card-infinia {
-        opacity: 1;
-        pointer-events: auto;
       }
 
       #heroSection[data-theme="millennia"] .hero-settings-label {
@@ -155,7 +172,7 @@
       }
 
       #heroSection[data-theme="millennia"] .hero-settings-arrow {
-        filter: none;
+        color: #6b7280;
       }
 
       #heroSection[data-theme="millennia"] .hero-info-gradient {
@@ -166,15 +183,12 @@
         color: #ffffff;
       }
 
-      #heroSection[data-theme="infinia"] .hero-text-secondary {
-        color: rgba(255, 255, 255, 0.72);
+      #heroSection[data-theme="infinia"] .hero-text-primary.hero-credit-limit-label {
+        color: #a3a3a3;
       }
 
-      #heroSection[data-theme="infinia"] .hero-chip {
-        background: rgba(223, 235, 250, 0.2);
-        color: #ffffff;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+      #heroSection[data-theme="infinia"] .hero-text-secondary {
+        color: #a3a3a3;
       }
 
       #heroSection[data-theme="infinia"] .hero-settings-label {
@@ -182,12 +196,7 @@
       }
 
       #heroSection[data-theme="infinia"] .hero-settings-arrow {
-        filter: brightness(0) invert(1);
-      }
-
-      #heroSection[data-theme="infinia"] .hero-chip-copy {
-        filter: brightness(0) invert(1);
-        opacity: 1;
+        color: rgba(255, 255, 255, 0.82);
       }
 
       #heroSection[data-theme="infinia"] .hero-info-gradient {
@@ -249,7 +258,7 @@
         --card-settings-panel-space: 156px;
         --card-settings-content-shift: 0px;
         --card-settings-card-shift: 0px;
-        height: calc(540px + var(--card-settings-panel-space));
+        height: calc(556px + var(--card-settings-panel-space));
         transition:
           height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
           background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -274,9 +283,10 @@
       }
 
       .hero-settings-arrow {
+        display: block;
         transition:
           transform 0.2s ease,
-          filter 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+          color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
         transform-origin: center;
       }
 
@@ -402,12 +412,57 @@
       #heroSection[data-theme="infinia"] #topBarSvg > g path[fill="#202E66"] {
         fill: #ffffff;
       }
+
+      .hero-card-dots__dot {
+        box-sizing: border-box;
+        height: 6px;
+        width: 6px;
+        flex-shrink: 0;
+        border-radius: 9999px;
+        padding: 0;
+        border: none;
+        cursor: pointer;
+        transition: width 0.2s ease, background 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .hero-card-dots__dot:focus {
+        outline: none;
+      }
+
+      .hero-card-dots__dot:focus-visible {
+        box-shadow: 0 0 0 2px rgba(28, 63, 202, 0.35);
+      }
+
+      #heroSection[data-theme="infinia"] .hero-card-dots__dot:focus-visible {
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
+      }
+
+      #heroSection[data-theme="millennia"] .hero-card-dots__dot {
+        background: rgba(17, 24, 39, 0.22);
+      }
+
+      #heroSection[data-theme="millennia"] .hero-card-dots__dot--active {
+        width: 18px;
+        background: #1c3fca;
+      }
+
+      #heroSection[data-theme="infinia"] .hero-card-dots__dot {
+        background: rgba(163, 163, 163, 0.45);
+      }
+
+      #heroSection[data-theme="infinia"] .hero-card-dots__dot--active {
+        width: 18px;
+        background: #a3a3a3;
+      }
     </style>
   </head>
   <body>
-    <div class="min-h-full w-full bg-white md:flex md:items-center md:justify-center md:bg-[#eef2f7] md:p-6">
+    <div
+      class="flex min-h-[100dvh] w-full min-w-0 flex-col items-center bg-white md:min-h-screen md:flex-row md:items-center md:justify-center md:bg-[#eef2f7] md:p-6"
+    >
       <div
-        class="relative h-[100dvh] w-[360px] overflow-hidden bg-white md:h-[844px] md:shadow-[0_24px_64px_rgba(15,23,42,0.18)]"
+        class="relative mx-auto h-[100dvh] w-full min-w-0 max-w-[360px] overflow-hidden bg-white md:mx-0 md:h-[844px] md:w-[360px] md:max-w-none md:flex-shrink-0 md:shadow-[0_24px_64px_rgba(15,23,42,0.18)]"
       >
         <main
           id="pageScroll"
@@ -533,11 +588,37 @@
 
             <div
               id="heroInfoLayer"
-              class="hero-info-gradient absolute left-0 top-[364px] z-20 w-full px-[16px] pb-[24px] pt-[8px]"
+              class="hero-info-gradient absolute left-0 top-[380px] z-20 w-full overflow-visible px-[16px] pb-[24px] pt-[8px]"
             >
+              <div
+                id="heroCardDots"
+                class="pointer-events-auto absolute left-0 right-0 top-[-8px] z-[2] flex justify-center gap-[8px]"
+                role="tablist"
+                aria-label="Card carousel"
+              >
+                <button
+                  type="button"
+                  class="hero-card-dots__dot hero-card-dots__dot--active"
+                  data-card-dot="0"
+                  role="tab"
+                  aria-selected="true"
+                  aria-label="Millennia card"
+                ></button>
+                <button
+                  type="button"
+                  class="hero-card-dots__dot"
+                  data-card-dot="1"
+                  role="tab"
+                  aria-selected="false"
+                  aria-label="Infinia card"
+                ></button>
+              </div>
+
               <div class="flex flex-col items-center gap-[12px] pb-[8px] pt-[12px]">
                 <div class="flex w-full flex-col items-center">
-                  <p class="hero-text-primary text-[10px] font-normal uppercase leading-[1.4]">AVAILABLE CREDIT LIMIT</p>
+                  <p class="hero-text-primary hero-credit-limit-label text-[10px] font-normal uppercase leading-[1.4]">
+                    AVAILABLE CREDIT LIMIT
+                  </p>
                   <div class="flex flex-col items-center">
                     <p class="hero-text-primary text-[24px] font-bold leading-[1.2]">
                       <span class="theme-amount-pair theme-amount-pair--center">
@@ -548,25 +629,54 @@
                   </div>
                 </div>
 
-                <div class="hero-chip flex items-center gap-[8px] rounded-[8px] pl-[4px] pr-[8px] py-[4px]">
-                  <div class="hero-chip-brand-slot">
+                <div class="hero-chip">
+                  <div class="hero-chip-millennia-block flex items-center gap-[8px] rounded-[8px] pl-[4px] pr-[8px] py-[4px]">
+                    <div class="hero-chip-brand-slot">
+                      <img
+                        alt="Mastercard"
+                        class="hero-chip-card-millennia h-[18px] w-[28px] object-contain object-left"
+                        src="assets/master_card_logo.png"
+                      />
+                    </div>
+                    <p class="text-[12px] font-medium leading-[1.2]">•••• •••• •••• 9132</p>
+                    <svg
+                      class="hero-chip-copy shrink-0"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <g opacity="0.9">
+                        <path
+                          d="M10.6666 8.60065V11.4007C10.6666 13.734 9.73325 14.6673 7.39992 14.6673H4.59992C2.26659 14.6673 1.33325 13.734 1.33325 11.4007V8.60065C1.33325 6.26732 2.26659 5.33398 4.59992 5.33398H7.39992C9.73325 5.33398 10.6666 6.26732 10.6666 8.60065Z"
+                          stroke="#111827"
+                          stroke-width="1.3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M14.6666 4.60065V7.40065C14.6666 9.73398 13.7333 10.6673 11.3999 10.6673H10.6666V8.60065C10.6666 6.26732 9.73325 5.33398 7.39992 5.33398H5.33325V4.60065C5.33325 2.26732 6.26659 1.33398 8.59992 1.33398H11.3999C13.7333 1.33398 14.6666 2.26732 14.6666 4.60065Z"
+                          stroke="#111827"
+                          stroke-width="1.3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="hero-chip-infinia-block">
                     <img
-                      alt="Mastercard"
-                      class="hero-chip-card-millennia h-[18px] w-[28px] object-contain object-left"
-                      src="assets/master_card_logo.png"
-                    />
-                    <img
-                      alt="Visa"
-                      class="hero-chip-card-infinia h-[18px] w-[24px] object-contain"
-                      src="assets/6566b437c54ef9890f06c659a00acc2afaa446cb.svg"
+                      alt="Card number ending 9132"
+                      width="180"
+                      height="26"
+                      class="block h-[26px] w-[180px] max-w-none shrink-0"
+                      src="assets/infinia-card-details-row.svg"
+                      decoding="async"
                     />
                   </div>
-                  <p class="text-[12px] font-medium leading-[1.2]">•••• •••• •••• 9132</p>
-                  <img
-                    alt="Copy"
-                    class="hero-chip-copy h-[16px] w-[16px] opacity-90"
-                    src="assets/hero-chip-copy.svg"
-                  />
                 </div>
               </div>
 
@@ -593,25 +703,37 @@
                   class="hero-settings-toggle flex items-center justify-center gap-[3px] border-0 bg-transparent py-[8px] px-0"
                 >
                   <p class="hero-settings-label text-center text-[11px] font-normal leading-[1.4]">Card Settings</p>
-                  <img
-                    alt=""
-                    class="hero-settings-arrow h-[12px] w-[12px]"
-                    src="assets/content3-benefit-chevron.svg"
-                  />
+                  <svg
+                    class="hero-settings-arrow h-[12px] w-[12px] shrink-0"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M2.5 4.25L6 7.75L9.5 4.25"
+                      stroke="currentColor"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
           </section>
 
-          <section id="contentFrame" class="relative z-30 -mt-[16px] overflow-visible rounded-t-[24px] bg-white px-[16px] pb-[12px] pt-[2px]">
+          <section id="contentFrame" class="relative z-30 -mt-[16px] overflow-visible rounded-t-[24px] bg-white pb-[12px] pt-[2px]">
             <img
               id="contentFrameTopDesign"
               alt=""
-              class="relative -top-[6px] -mb-[10px] left-1/2 block h-[28px] w-[360px] max-w-none -translate-x-1/2 object-cover object-top"
+              class="relative -top-[6px] -mb-[10px] block h-[28px] w-full min-h-[28px] object-cover object-top"
               src="assets/content-frame-top-design.png"
             />
 
-            <div class="space-y-[16px]">
+            <div class="space-y-[16px] px-[16px]">
               <div id="content1" class="flex justify-center overflow-hidden rounded-[12px]">
                 <img alt="" class="h-auto w-full max-w-[352px]" src="assets/content-options-frame.svg" />
               </div>
@@ -893,6 +1015,10 @@
         var heroSection = document.getElementById("heroSection");
         var cardSettingsToggle = document.getElementById("cardSettingsToggle");
         var cardSettingsPanel = document.getElementById("cardSettingsPanel");
+        var heroCardDots = document.getElementById("heroCardDots");
+        var dotButtons = heroCardDots
+          ? Array.prototype.slice.call(heroCardDots.querySelectorAll("[data-card-dot]"), 0)
+          : [];
 
         var cards = [
           {
@@ -1073,6 +1199,14 @@
           return Math.max(0, Math.min(cards.length - 1, Math.round(cardsViewport.scrollLeft / width)));
         }
 
+        function paintCardDots() {
+          for (var d = 0; d < dotButtons.length; d++) {
+            var on = d === activeIndex;
+            dotButtons[d].classList.toggle("hero-card-dots__dot--active", on);
+            dotButtons[d].setAttribute("aria-selected", on ? "true" : "false");
+          }
+        }
+
         function updateActiveCard() {
           var idx = getActiveIndex();
           if (idx !== activeIndex) {
@@ -1080,6 +1214,7 @@
           }
           activeIndex = idx;
           syncIntroMotion();
+          paintCardDots();
         }
 
         function easeInQuad(t) {
@@ -1145,6 +1280,9 @@
           var card = cards[activeIndex];
           var progress = card ? card.progress : 0;
           var infoShift = Math.round(-112 * progress);
+          if (progress >= 1) {
+            infoShift += 8;
+          }
           pageScroll.style.setProperty("--intro-info-shift", infoShift + "px");
         }
 
@@ -1239,6 +1377,16 @@
           cardSettingsToggle.addEventListener("click", function () {
             var isOpen = cardSettingsToggle.getAttribute("aria-expanded") === "true";
             setCardSettingsOpen(!isOpen);
+          });
+        }
+
+        for (var di = 0; di < dotButtons.length; di++) {
+          dotButtons[di].addEventListener("click", function () {
+            var raw = this.getAttribute("data-card-dot");
+            var idx = raw ? parseInt(raw, 10) : 0;
+            if (idx >= 0 && idx < cards.length) {
+              animateCarouselToIndex(idx);
+            }
           });
         }
 
