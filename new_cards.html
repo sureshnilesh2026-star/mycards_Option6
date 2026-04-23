@@ -37,6 +37,7 @@
       body {
         margin: 0;
         overflow: hidden;
+        overscroll-behavior: none;
         background: #ffffff;
         -webkit-tap-highlight-color: transparent;
       }
@@ -224,6 +225,7 @@
 
       #pageScroll {
         --intro-info-shift: 0px;
+        overscroll-behavior-y: none;
       }
 
       .theme-amount-pair {
@@ -434,15 +436,13 @@
       #heroInfoLayer {
         top: calc(100cqw * 380 / 360);
         transform: translateY(calc(var(--card-settings-content-shift) + var(--intro-info-shift)));
-        transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: none;
       }
 
       #contentFrame {
         transform: translateY(var(--intro-info-shift));
         margin-bottom: var(--intro-info-shift);
-        transition:
-          transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
-          margin-bottom 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: none;
       }
 
       #contentFrame #content1,
@@ -1121,11 +1121,11 @@
         var touchX = 0;
         var touchY = 0;
         var gestureDirection = null;
+        var touchIntroLocked = false;
         var carouselSnapTimer = 0;
         var carouselAnimFrame = 0;
         var isCarouselAnimating = false;
         var introAnimFrame = 0;
-        var lastIntroTick = 0;
 
         function pad4(n) {
           return String(n).padStart(4, "0");
@@ -1151,6 +1151,9 @@
           var dpr = Math.min(window.devicePixelRatio || 1, 2);
           var targetW = Math.max(1, Math.round(rect.width * dpr));
           var targetH = Math.max(1, Math.round(rect.height * dpr));
+          if (!card.ctx) {
+            card.ctx = card.canvas.getContext("2d", { alpha: true, desynchronized: true });
+          }
           if (card.canvas.width !== targetW || card.canvas.height !== targetH) {
             card.canvas.width = targetW;
             card.canvas.height = targetH;
@@ -1167,7 +1170,7 @@
           var image = card.images[drawableIndex];
           if (!image) return;
 
-          var ctx = card.canvas.getContext("2d", { alpha: true, desynchronized: true });
+          var ctx = card.ctx;
           if (!ctx) return;
 
           var cw = card.canvas.width;
@@ -1349,48 +1352,78 @@
           var card = cards[activeIndex];
           var progress = card ? card.progress : 0;
           var scale = heroSection && heroSection.clientWidth ? heroSection.clientWidth / 360 : 1;
-          var infoShift = Math.round(-112 * scale * progress);
-          if (progress >= 1) {
-            infoShift += Math.round(8 * scale);
-          }
-          pageScroll.style.setProperty("--intro-info-shift", infoShift + "px");
+          var infoShift = (-112 + 8 * progress) * scale * progress;
+          pageScroll.style.setProperty("--intro-info-shift", infoShift.toFixed(3) + "px");
         }
 
-        function advanceIntro(deltaY) {
+        function canAnimateIntroForDelta(deltaY) {
           if (deltaY === 0) return false;
           if (pageScroll.scrollTop > 0) return false;
-
           var card = cards[activeIndex];
-          var next = clamp01(card.targetProgress + deltaY / introDistance);
-          if (next === card.targetProgress) return false;
-          card.targetProgress = next;
+          if (!card) return false;
+          if (deltaY > 0) {
+            return card.progress < 0.999 || card.targetProgress < 0.999;
+          }
+          return card.progress > 0.001 || card.targetProgress > 0.001;
+        }
+
+        function animateIntroToEdge(deltaY) {
+          if (!canAnimateIntroForDelta(deltaY)) return false;
+          var card = cards[activeIndex];
+          var target = deltaY > 0 ? 1 : 0;
+          if (card.targetProgress === target) {
+            if (Math.abs(card.progress - target) < 0.0004) {
+              return false;
+            }
+            // Keep the current animation running; avoid restarting and jerking.
+            pageScroll.scrollTop = 0;
+            return true;
+          }
+          card.animStartProgress = card.progress;
+          card.animStartTime = 0;
+          var travel = Math.abs(target - card.progress);
+          card.animDuration = Math.max(180, Math.min(380, 180 + travel * 260));
+          card.targetProgress = target;
           startIntroAnimation();
           pageScroll.scrollTop = 0;
           return true;
         }
 
         function tickIntroAnimation(timestamp) {
-          if (!lastIntroTick) lastIntroTick = timestamp;
-          var dt = Math.max(0, timestamp - lastIntroTick);
-          lastIntroTick = timestamp;
           var needsMore = false;
 
           for (var i = 0; i < cards.length; i += 1) {
             var card = cards[i];
-            var diff = card.targetProgress - card.progress;
-            if (Math.abs(diff) < 0.0004) {
-              if (card.progress !== card.targetProgress) {
-                card.progress = card.targetProgress;
+            var target = card.targetProgress;
+            if (Math.abs(target - card.progress) < 0.0004) {
+              if (card.progress !== target) {
+                card.progress = target;
                 drawCard(card);
               }
+              card.animStartTime = 0;
+              card.animStartProgress = target;
               continue;
             }
 
-            var lerp = Math.min(1, dt / 110);
-            card.progress += diff * lerp;
-            card.progress = clamp01(card.progress);
+            if (!card.animStartTime) {
+              card.animStartTime = timestamp;
+              card.animStartProgress = card.progress;
+              if (!card.animDuration) card.animDuration = 260;
+            }
+
+            var elapsed = timestamp - card.animStartTime;
+            var duration = card.animDuration || 260;
+            var t = Math.max(0, Math.min(1, elapsed / duration));
+            card.progress = clamp01(card.animStartProgress + (target - card.animStartProgress) * t);
             drawCard(card);
-            needsMore = true;
+            if (t < 1) {
+              needsMore = true;
+            } else {
+              card.progress = target;
+              drawCard(card);
+              card.animStartTime = 0;
+              card.animStartProgress = target;
+            }
           }
 
           syncIntroMotion();
@@ -1398,7 +1431,6 @@
             introAnimFrame = requestAnimationFrame(tickIntroAnimation);
           } else {
             introAnimFrame = 0;
-            lastIntroTick = 0;
           }
         }
 
@@ -1409,7 +1441,7 @@
 
         function onWheel(event) {
           updateActiveCard();
-          if (advanceIntro(event.deltaY)) {
+          if (animateIntroToEdge(event.deltaY)) {
             event.preventDefault();
           }
         }
@@ -1419,6 +1451,7 @@
           touchX = touchStartX = event.touches[0].clientX;
           touchY = touchStartY = event.touches[0].clientY;
           gestureDirection = null;
+          touchIntroLocked = false;
         }
 
         function onTouchMove(event) {
@@ -1442,12 +1475,20 @@
 
           var deltaY = touchY - currentY;
           updateActiveCard();
-          if (advanceIntro(deltaY * 3.5)) {
+          if (touchIntroLocked) {
+            event.preventDefault();
+          } else if (Math.abs(deltaY) > 3 && animateIntroToEdge(deltaY)) {
+            touchIntroLocked = true;
             event.preventDefault();
           }
 
           touchX = currentX;
           touchY = currentY;
+        }
+
+        function onTouchEnd() {
+          touchIntroLocked = false;
+          gestureDirection = null;
         }
 
         function onResize() {
@@ -1468,6 +1509,9 @@
 
         cards.forEach(function (card) {
           card.targetProgress = card.progress;
+          card.animStartProgress = card.progress;
+          card.animStartTime = 0;
+          card.animDuration = 260;
           resizeCanvas(card);
           preloadCard(card);
         });
@@ -1510,6 +1554,8 @@
         pageScroll.addEventListener("wheel", onWheel, { passive: false });
         pageScroll.addEventListener("touchstart", onTouchStart, { passive: true });
         pageScroll.addEventListener("touchmove", onTouchMove, { passive: false });
+        pageScroll.addEventListener("touchend", onTouchEnd, { passive: true });
+        pageScroll.addEventListener("touchcancel", onTouchEnd, { passive: true });
         window.addEventListener("resize", onResize);
         window.addEventListener("orientationchange", onResize);
       })();
