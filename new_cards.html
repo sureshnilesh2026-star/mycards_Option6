@@ -58,12 +58,12 @@
       }
 
       .hero-theme {
-        transition: background 0.38s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: background 0.16s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .hero-text-primary,
       .hero-text-secondary {
-        transition: color 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: color 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .hero-chip {
@@ -93,7 +93,7 @@
 
       #heroSection[data-theme="infinia"] .hero-chip-millennia-block,
       #pageScroll[data-theme="infinia"] .hero-chip-millennia-block {
-        display: none;
+        display: flex;
       }
 
       #heroSection[data-theme="infinia"] .hero-chip-infinia-block,
@@ -113,7 +113,7 @@
       }
 
       .hero-info-gradient {
-        transition: background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: background 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       .hero-chip-copy {
@@ -244,6 +244,9 @@
         --hero-scale-width: 360px;
         --hero-info-top: calc(var(--hero-scale-width) * 380 / 360);
         --card-settings-content-shift: 0px;
+        --carousel-blend: 0;
+        --millennia-alpha: 1;
+        --infinia-alpha: 0;
         overscroll-behavior-y: none;
       }
 
@@ -261,18 +264,17 @@
       .theme-amount-pair .amount-m,
       .theme-amount-pair .amount-i {
         grid-area: 1 / 1;
-        transition: opacity 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
-      #pageScroll[data-theme="millennia"] .theme-amount-pair .amount-i,
-      #pageScroll[data-theme="infinia"] .theme-amount-pair .amount-m {
-        opacity: 0;
+      .theme-amount-pair .amount-m {
+        opacity: var(--millennia-alpha);
         pointer-events: none;
       }
 
-      #pageScroll[data-theme="millennia"] .theme-amount-pair .amount-m,
-      #pageScroll[data-theme="infinia"] .theme-amount-pair .amount-i {
-        opacity: 1;
+      .theme-amount-pair .amount-i {
+        opacity: var(--infinia-alpha);
+        pointer-events: none;
       }
 
       #heroSection {
@@ -290,6 +292,7 @@
 
       #cardsViewport {
         height: calc(var(--hero-scale-width) * 779 / 360);
+        z-index: 1;
       }
 
       .hero-cards-viewport > div:nth-child(1) {
@@ -351,6 +354,43 @@
         scroll-behavior: smooth;
         -webkit-overflow-scrolling: touch;
         transform: translateY(var(--card-settings-card-shift));
+      }
+
+      .hero-cards-stage {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: calc(var(--hero-scale-width) * 779 / 360);
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .hero-card-layer {
+        position: absolute;
+        inset: 0;
+        transition: opacity 0.1s linear;
+        will-change: opacity;
+      }
+
+      .hero-chip {
+        display: grid;
+        place-items: center;
+      }
+
+      .hero-chip-millennia-block,
+      .hero-chip-infinia-block {
+        grid-area: 1 / 1;
+      }
+
+      .hero-chip-millennia-block {
+        opacity: var(--millennia-alpha);
+      }
+
+      .hero-chip-infinia-block {
+        display: flex;
+        opacity: var(--infinia-alpha);
       }
 
       .hero-cards-viewport > div {
@@ -435,25 +475,25 @@
 
       #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia,
       #pageScroll[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia {
-        opacity: 1;
+        opacity: var(--millennia-alpha);
         pointer-events: auto;
       }
 
       #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia,
       #pageScroll[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia {
-        opacity: 0;
+        opacity: var(--infinia-alpha);
         pointer-events: none;
       }
 
       #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-millennia,
       #pageScroll[data-theme="infinia"] #cardSettingsPanel .card-settings-art-millennia {
-        opacity: 0;
+        opacity: var(--millennia-alpha);
         pointer-events: none;
       }
 
       #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-infinia,
       #pageScroll[data-theme="infinia"] #cardSettingsPanel .card-settings-art-infinia {
-        opacity: 1;
+        opacity: var(--infinia-alpha);
         pointer-events: auto;
       }
 
@@ -601,7 +641,11 @@
               class="hero-cards-viewport hide-scrollbar absolute left-0 top-0 flex w-full overflow-x-auto overflow-y-hidden"
               aria-label="Cards carousel"
             >
-              <div class="relative w-full shrink-0">
+              <div class="relative w-full shrink-0"></div>
+              <div class="relative w-full shrink-0"></div>
+            </div>
+            <div id="cardsStage" class="hero-cards-stage" aria-hidden="true">
+              <div class="hero-card-layer" data-card-layer="millennia">
                 <div class="sequence-frame absolute inset-0" data-card="millennia">
                   <canvas id="millenniaCanvas" aria-label="Millennia card animation"></canvas>
                   <div
@@ -612,7 +656,7 @@
                   </div>
                 </div>
               </div>
-              <div class="relative w-full shrink-0">
+              <div class="hero-card-layer" data-card-layer="infinia">
                 <div class="sequence-frame absolute inset-0" data-card="infinia">
                   <canvas id="infiniaCanvas" aria-label="Infinia card animation"></canvas>
                   <div
@@ -1173,6 +1217,9 @@
         var cardSettingsToggle = document.getElementById("cardSettingsToggle");
         var cardSettingsPanel = document.getElementById("cardSettingsPanel");
         var heroCardDots = document.getElementById("heroCardDots");
+        var cardLayers = cardsViewport
+          ? Array.prototype.slice.call(document.querySelectorAll("[data-card-layer]"), 0)
+          : [];
         var dotButtons = heroCardDots
           ? Array.prototype.slice.call(heroCardDots.querySelectorAll("[data-card-dot]"), 0)
           : [];
@@ -1185,7 +1232,7 @@
             basePath: "assets/animation/millennia_card/",
             filePrefix: "Millennia Card",
             progress: 0,
-            frameCount: 65,
+            frameCount: 120,
             images: [],
             loadedCount: 0,
             lastDrawnFrame: -1,
@@ -1197,7 +1244,7 @@
             basePath: "assets/animation/infinia_card/",
             filePrefix: "Infinia Card",
             progress: 0,
-            frameCount: 65,
+            frameCount: 120,
             images: [],
             loadedCount: 0,
             lastDrawnFrame: -1,
@@ -1205,6 +1252,7 @@
         ];
 
         var activeIndex = getInitialCardIndexFromUrl();
+        var currentThemeIndex = activeIndex;
         var introDistance = Math.max(65 * 20, 1200);
         var touchStartX = 0;
         var touchStartY = 0;
@@ -1217,6 +1265,7 @@
         var contentFrameAnchorTimer = 0;
         var isCarouselAnimating = false;
         var introAnimFrame = 0;
+        var horizontalFrameEnd = 60;
 
         function pad4(n) {
           return String(n).padStart(4, "0");
@@ -1336,6 +1385,70 @@
           var theme = cards[index].id === "infinia" ? "infinia" : "millennia";
           heroSection.setAttribute("data-theme", theme);
           if (pageScroll) pageScroll.setAttribute("data-theme", theme);
+          currentThemeIndex = index;
+        }
+
+        function getHorizontalRangeProgress(card) {
+          if (!card || card.frameCount <= 1) return 0;
+          var maxFrameIndex = card.frameCount - 1;
+          var horizontalEndIndex = Math.max(0, Math.min(maxFrameIndex, horizontalFrameEnd - 1));
+          return horizontalEndIndex / maxFrameIndex;
+        }
+
+        function getCardCompositeProgress(card) {
+          if (!card) return 0;
+          var horizontalRangeProgress = getHorizontalRangeProgress(card);
+          var horizontalPart = clamp01(card.horizontalProgress || 0) * horizontalRangeProgress;
+          var verticalProgress = clamp01(card.verticalProgress || 0);
+          if (verticalProgress > 0.0001 || (card.verticalTarget || 0) > 0.0001) {
+            return horizontalRangeProgress + verticalProgress * (1 - horizontalRangeProgress);
+          }
+          return horizontalPart;
+        }
+
+        function refreshCardProgress(card) {
+          if (!card) return;
+          var nextProgress = clamp01(getCardCompositeProgress(card));
+          if (Math.abs(nextProgress - card.progress) < 0.0001) return;
+          card.progress = nextProgress;
+          drawCard(card);
+        }
+
+        function paintCardProgressFromCarousel() {
+          var blend = getCarouselBlend();
+          for (var i = 0; i < cards.length; i += 1) {
+            var card = cards[i];
+            card.horizontalProgress = i === 1 ? blend : 1 - blend;
+            refreshCardProgress(card);
+          }
+        }
+
+        function getCarouselBlend() {
+          if (!cardsViewport) return 0;
+          var width = cardsViewport.clientWidth || 1;
+          var blend = cardsViewport.scrollLeft / width;
+          return clamp01(blend);
+        }
+
+        function paintCardLayers() {
+          if (!cardLayers.length) return;
+          var blend = getCarouselBlend();
+          for (var i = 0; i < cardLayers.length; i += 1) {
+            var layer = cardLayers[i];
+            var isInfinia = layer.getAttribute("data-card-layer") === "infinia";
+            layer.style.opacity = isInfinia ? blend.toFixed(3) : (1 - blend).toFixed(3);
+          }
+        }
+
+        function paintThemeBlendVars() {
+          var blend = getCarouselBlend();
+          var millenniaAlpha = 1 - blend;
+          var infiniaAlpha = blend;
+          if (pageScroll) {
+            pageScroll.style.setProperty("--carousel-blend", blend.toFixed(3));
+            pageScroll.style.setProperty("--millennia-alpha", millenniaAlpha.toFixed(3));
+            pageScroll.style.setProperty("--infinia-alpha", infiniaAlpha.toFixed(3));
+          }
         }
 
         function getInitialCardIndexFromUrl() {
@@ -1378,12 +1491,15 @@
           }
         }
 
-        function updateActiveCard() {
+        function updateActiveCard(options) {
           var idx = getActiveIndex();
-          if (idx !== activeIndex) {
-            setTheme(idx);
-          }
+          var blend = getCarouselBlend();
+          var themeIndex = blend >= 0.5 ? 1 : 0;
+          if (themeIndex !== currentThemeIndex) setTheme(themeIndex);
           activeIndex = idx;
+          paintThemeBlendVars();
+          paintCardProgressFromCarousel();
+          paintCardLayers();
           syncIntroMotion();
           paintCardDots();
         }
@@ -1450,7 +1566,7 @@
         function syncIntroMotion() {
           if (!pageScroll) return;
           var card = cards[activeIndex];
-          var progress = card ? card.progress : 0;
+          var progress = card ? clamp01(card.verticalProgress || 0) : 0;
           var scale = heroSection && heroSection.clientWidth ? heroSection.clientWidth / 360 : 1;
           var infoShift = (-112 + 8 * progress) * scale * progress;
           pageScroll.style.setProperty("--intro-info-shift", infoShift.toFixed(3) + "px");
@@ -1487,22 +1603,22 @@
           var card = cards[activeIndex];
           if (!card) return false;
           if (deltaY > 0) {
-            return card.progress < 0.999 || card.targetProgress < 0.999;
+            return card.verticalProgress < 0.999 || card.verticalTarget < 0.999;
           }
-          return card.progress > 0.001 || card.targetProgress > 0.001;
+          return card.verticalProgress > 0.001 || card.verticalTarget > 0.001;
         }
 
         function animateActiveCardToProgress(targetProgress, durationMs) {
           var card = cards[activeIndex];
           if (!card) return false;
           var target = clamp01(targetProgress);
-          if (Math.abs(card.progress - target) < 0.0004 && Math.abs(card.targetProgress - target) < 0.0004) {
+          if (Math.abs(card.verticalProgress - target) < 0.0004 && Math.abs(card.verticalTarget - target) < 0.0004) {
             return false;
           }
-          card.animStartProgress = card.progress;
+          card.animStartProgress = card.verticalProgress;
           card.animStartTime = 0;
           card.animDuration = Math.max(120, durationMs || 280);
-          card.targetProgress = target;
+          card.verticalTarget = target;
           startIntroAnimation();
           return true;
         }
@@ -1511,19 +1627,19 @@
           if (!canAnimateIntroForDelta(deltaY)) return false;
           var card = cards[activeIndex];
           var target = deltaY > 0 ? 1 : 0;
-          if (card.targetProgress === target) {
-            if (Math.abs(card.progress - target) < 0.0004) {
+          if (card.verticalTarget === target) {
+            if (Math.abs(card.verticalProgress - target) < 0.0004) {
               return false;
             }
             // Keep the current animation running; avoid restarting and jerking.
             pageScroll.scrollTop = 0;
             return true;
           }
-          card.animStartProgress = card.progress;
+          card.animStartProgress = card.verticalProgress;
           card.animStartTime = 0;
-          var travel = Math.abs(target - card.progress);
+          var travel = Math.abs(target - card.verticalProgress);
           card.animDuration = Math.max(180, Math.min(380, 180 + travel * 260));
-          card.targetProgress = target;
+          card.verticalTarget = target;
           startIntroAnimation();
           pageScroll.scrollTop = 0;
           return true;
@@ -1534,11 +1650,11 @@
 
           for (var i = 0; i < cards.length; i += 1) {
             var card = cards[i];
-            var target = card.targetProgress;
-            if (Math.abs(target - card.progress) < 0.0004) {
-              if (card.progress !== target) {
-                card.progress = target;
-                drawCard(card);
+            var target = card.verticalTarget;
+            if (Math.abs(target - card.verticalProgress) < 0.0004) {
+              if (card.verticalProgress !== target) {
+                card.verticalProgress = target;
+                refreshCardProgress(card);
               }
               card.animStartTime = 0;
               card.animStartProgress = target;
@@ -1554,13 +1670,13 @@
             var elapsed = timestamp - card.animStartTime;
             var duration = card.animDuration || 260;
             var t = Math.max(0, Math.min(1, elapsed / duration));
-            card.progress = clamp01(card.animStartProgress + (target - card.animStartProgress) * t);
-            drawCard(card);
+            card.verticalProgress = clamp01(card.animStartProgress + (target - card.animStartProgress) * t);
+            refreshCardProgress(card);
             if (t < 1) {
               needsMore = true;
             } else {
-              card.progress = target;
-              drawCard(card);
+              card.verticalProgress = target;
+              refreshCardProgress(card);
               card.animStartTime = 0;
               card.animStartProgress = target;
             }
@@ -1648,12 +1764,12 @@
           heroSection.style.setProperty("--card-settings-card-shift", "0px");
           var card = cards[activeIndex];
           if (isOpen) {
-            var startsAtFirstFrame = !!card && card.progress <= 0.001 && card.targetProgress <= 0.001;
+            var startsAtFirstFrame = !!card && card.verticalProgress <= 0.001 && card.verticalTarget <= 0.001;
             if (startsAtFirstFrame) {
               animateActiveCardToProgress(1, 280);
             }
           } else {
-            var startsAtLastFrame = !!card && card.progress >= 0.999 && card.targetProgress >= 0.999;
+            var startsAtLastFrame = !!card && card.verticalProgress >= 0.999 && card.verticalTarget >= 0.999;
             if (startsAtLastFrame) {
               animateActiveCardToProgress(0, 280);
             }
@@ -1662,10 +1778,13 @@
         }
 
         cards.forEach(function (card) {
-          card.targetProgress = card.progress;
-          card.animStartProgress = card.progress;
+          card.horizontalProgress = 0;
+          card.verticalProgress = 0;
+          card.verticalTarget = 0;
+          card.animStartProgress = 0;
           card.animStartTime = 0;
           card.animDuration = 260;
+          card.progress = 0;
           resizeCanvas(card);
           preloadCard(card);
         });
