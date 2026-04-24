@@ -117,6 +117,7 @@
         max-width: none;
         height: 100dvh;
         overflow: hidden;
+        background: #ffffff;
         transform: translateY(calc(-1 * var(--keyboard-lift, 0px)));
         transition: transform 0.32s ease-in-out;
         will-change: transform;
@@ -131,6 +132,16 @@
         .frame-root {
           transition: none;
         }
+      }
+      #verify-bg-millennia,
+      #verify-bg-infinia {
+        transition: opacity 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .frame-root.verify-bg--millennia #verify-bg-millennia {
+        opacity: 1;
+      }
+      .frame-root.verify-bg--infinia #verify-bg-infinia {
+        opacity: 1;
       }
       /* Top chrome: MyCards redesign app header (360×55), same asset as card.html; dark band so white artwork reads */
       #verify-top-bar {
@@ -415,6 +426,18 @@
   </head>
   <body class="bg-white flex items-start justify-center p-0 box-border w-full h-[100dvh]">
     <div class="frame-root relative rounded-none bg-white flex flex-col flex-shrink-0 w-full">
+      <div
+        id="verify-bg-millennia"
+        class="absolute inset-0 z-0 opacity-0 pointer-events-none"
+        style="background: linear-gradient(180deg, #D4E4F8 0%, #FFFFFF 100%);"
+        aria-hidden="true"
+      ></div>
+      <div
+        id="verify-bg-infinia"
+        class="absolute inset-0 z-0 opacity-0 pointer-events-none"
+        style="background: linear-gradient(180deg, #0C101F 0%, #131B34 100%);"
+        aria-hidden="true"
+      ></div>
       <!-- Step: show only WalletFinal; hide all other elements -->
       <!-- App header chrome: redesign SVG (same asset as card.html) -->
       <div
@@ -696,12 +719,15 @@
         var lastVerifiedStackIndex = -1;
         /* Post–verify pick: selected card animates to this top (px). */
         var FINAL_PICK_TOP_PX = 208;
+        var FINAL_PICK_EXTRA_UP_PX = 70;
+        var FINAL_PICK_SCALE = 0.7;
         /* digit strip sits this far below the active card’s top (px); same offset after Done */
         var DIGITS_TOP_OFFSET = 118;
         var VERIFY_INPUT_LIFT_PX = 80;
+        var VERIFY_END_SHIFT_UP_PX = 120;
         var CARD_TOP_KEYBOARD_BASE = 360;
-        var CARD_TOP_KEYBOARD = CARD_TOP_KEYBOARD_BASE - VERIFY_INPUT_LIFT_PX;
-        var CARD_TOP_AFTER_DONE = 520;
+        var CARD_TOP_KEYBOARD = CARD_TOP_KEYBOARD_BASE - VERIFY_INPUT_LIFT_PX - VERIFY_END_SHIFT_UP_PX;
+        var CARD_TOP_AFTER_DONE = 520 - VERIFY_END_SHIFT_UP_PX;
         var CARD_SELECT_VERIFY_TOP_BASE = 308;
         var CHOOSE_ANOTHER_VERIFY_TOP_BASE = 338;
         var INFO_LAYER_VERIFY_TOP_BASE = -78;
@@ -722,12 +748,15 @@
         var INFO_TITLE_VERIFY = "Let’s Verify if It’s You";
         var INFO_TITLE_STACK = "We have added all these cards";
         var FINAL_PICK_ANIM_MS = 600;
-        var CARD_SELECT_VERIFY_TOP = CARD_SELECT_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
-        var CHOOSE_ANOTHER_VERIFY_TOP = CHOOSE_ANOTHER_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
+        var CARD_SELECT_VERIFY_TOP =
+          CARD_SELECT_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX - VERIFY_END_SHIFT_UP_PX;
+        var CHOOSE_ANOTHER_VERIFY_TOP =
+          CHOOSE_ANOTHER_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX - VERIFY_END_SHIFT_UP_PX;
         var INFO_LAYER_VERIFY_TOP = INFO_LAYER_VERIFY_TOP_BASE - VERIFY_INPUT_LIFT_PX;
-        var POST_INPUT_SHIFT_UP_PX = 60;
+        var POST_INPUT_SHIFT_UP_PX = 120;
         var VERIFY_SUCCESS_MS = 2000;
         var VERIFY_SUCCESS_SHEET_MS = 320;
+        var CARD_AFTER_DONE_EXTRA_UP_PX = 40;
         var isVerifySuccessShowing = false;
         /* Verification starts only on explicit card click from stack (no auto-open on load). */
         var VERIFY_AUTO_START_LAST4_ON_LOAD = false;
@@ -736,6 +765,16 @@
         var verifyKeyboardLiftTimer = null;
         var verifyKeyboardLiftRaf = null;
         var lastVerifyLiftApplied = -1;
+
+        function setFinalFrameTheme(theme) {
+          if (!frameShell) return;
+          frameShell.classList.remove("verify-bg--millennia", "verify-bg--infinia");
+          if (theme === "millennia") {
+            frameShell.classList.add("verify-bg--millennia");
+          } else if (theme === "infinia") {
+            frameShell.classList.add("verify-bg--infinia");
+          }
+        }
 
         function getWalletTopInFrame() {
           if (!frameShell || !el) return 0;
@@ -1428,6 +1467,7 @@
         function resetCardVerifyUI(opts) {
           opts = opts || {};
           var deferStackHint = opts.deferStackHint === true;
+          setFinalFrameTheme("");
           isVerifying = false;
           enteredDigits = [];
           renderDigits();
@@ -1545,6 +1585,7 @@
           var picked = cards[pickedStackIndex];
           if (!picked) return;
           postVerifyFinalPickDone = true;
+          setFinalFrameTheme(pickedStackIndex === 1 ? "millennia" : "infinia");
           var pickEase = "600ms cubic-bezier(0.2, 0.8, 0.2, 1)";
           var exitEase = "750ms cubic-bezier(0.2, 0.8, 0.2, 1)";
 
@@ -1605,8 +1646,9 @@
           picked.style.cursor = "default";
           picked.style.zIndex = "40";
           picked.style.transition = "top " + pickEase + ", transform " + pickEase;
-          picked.style.top = FINAL_PICK_TOP_PX + "px";
-          picked.style.transform = "translateX(-50%) translateY(0) rotate(-50deg) scale(0.8)";
+          picked.style.top = FINAL_PICK_TOP_PX - FINAL_PICK_EXTRA_UP_PX + "px";
+          picked.style.transform =
+            "translateX(-50%) translateY(0) rotate(-50deg) scale(" + FINAL_PICK_SCALE + ")";
           window.setTimeout(function () {
             if (picked) picked.style.transition = "";
             if (digitsWrap) digitsWrap.style.transition = "";
@@ -1729,7 +1771,8 @@
           }
           if (activeCard) {
             activeCard.style.transition = CARD_MOVE_EASE;
-            activeCard.style.top = CARD_TOP_AFTER_DONE - POST_INPUT_SHIFT_UP_PX + "px";
+            activeCard.style.top =
+              CARD_TOP_AFTER_DONE - POST_INPUT_SHIFT_UP_PX - CARD_AFTER_DONE_EXTRA_UP_PX + "px";
           }
           if (digitsWrap && activeCard) {
             digitsWrap.style.zIndex = "35";

@@ -91,11 +91,13 @@
         flex-shrink: 0;
       }
 
-      #heroSection[data-theme="infinia"] .hero-chip-millennia-block {
+      #heroSection[data-theme="infinia"] .hero-chip-millennia-block,
+      #pageScroll[data-theme="infinia"] .hero-chip-millennia-block {
         display: none;
       }
 
-      #heroSection[data-theme="infinia"] .hero-chip-infinia-block {
+      #heroSection[data-theme="infinia"] .hero-chip-infinia-block,
+      #pageScroll[data-theme="infinia"] .hero-chip-infinia-block {
         display: flex;
       }
 
@@ -128,15 +130,18 @@
         background: linear-gradient(180deg, #041231 0%, #051e47 50%, #010513 100%);
       }
 
-      #heroSection[data-theme="millennia"] .hero-text-primary {
+      #heroSection[data-theme="millennia"] .hero-text-primary,
+      #pageScroll[data-theme="millennia"] .hero-text-primary {
         color: #111827;
       }
 
-      #heroSection[data-theme="millennia"] .hero-text-secondary {
+      #heroSection[data-theme="millennia"] .hero-text-secondary,
+      #pageScroll[data-theme="millennia"] .hero-text-secondary {
         color: #7b8995;
       }
 
-      #heroSection[data-theme="millennia"] .hero-chip-millennia-block {
+      #heroSection[data-theme="millennia"] .hero-chip-millennia-block,
+      #pageScroll[data-theme="millennia"] .hero-chip-millennia-block {
         background: rgba(223, 235, 250, 0.5);
         color: #111827;
       }
@@ -158,49 +163,60 @@
         pointer-events: none;
       }
 
-      #heroSection[data-theme="millennia"] .hero-chip-card-millennia {
+      #heroSection[data-theme="millennia"] .hero-chip-card-millennia,
+      #pageScroll[data-theme="millennia"] .hero-chip-card-millennia {
         opacity: 1;
         pointer-events: auto;
       }
 
-      #heroSection[data-theme="infinia"] .hero-chip-card-millennia {
+      #heroSection[data-theme="infinia"] .hero-chip-card-millennia,
+      #pageScroll[data-theme="infinia"] .hero-chip-card-millennia {
         opacity: 0;
         pointer-events: none;
       }
 
-      #heroSection[data-theme="millennia"] .hero-settings-label {
+      #heroSection[data-theme="millennia"] .hero-settings-label,
+      #pageScroll[data-theme="millennia"] .hero-settings-label {
         color: #4b5563;
       }
 
-      #heroSection[data-theme="millennia"] .hero-settings-arrow {
+      #heroSection[data-theme="millennia"] .hero-settings-arrow,
+      #pageScroll[data-theme="millennia"] .hero-settings-arrow {
         color: #6b7280;
       }
 
-      #heroSection[data-theme="millennia"] .hero-info-gradient {
+      #heroSection[data-theme="millennia"] .hero-info-gradient,
+      #pageScroll[data-theme="millennia"] .hero-info-gradient {
         background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 38.782%);
       }
 
-      #heroSection[data-theme="infinia"] .hero-text-primary {
+      #heroSection[data-theme="infinia"] .hero-text-primary,
+      #pageScroll[data-theme="infinia"] .hero-text-primary {
         color: #ffffff;
       }
 
-      #heroSection[data-theme="infinia"] .hero-text-primary.hero-credit-limit-label {
+      #heroSection[data-theme="infinia"] .hero-text-primary.hero-credit-limit-label,
+      #pageScroll[data-theme="infinia"] .hero-text-primary.hero-credit-limit-label {
         color: #a3a3a3;
       }
 
-      #heroSection[data-theme="infinia"] .hero-text-secondary {
+      #heroSection[data-theme="infinia"] .hero-text-secondary,
+      #pageScroll[data-theme="infinia"] .hero-text-secondary {
         color: #a3a3a3;
       }
 
-      #heroSection[data-theme="infinia"] .hero-settings-label {
+      #heroSection[data-theme="infinia"] .hero-settings-label,
+      #pageScroll[data-theme="infinia"] .hero-settings-label {
         color: rgba(255, 255, 255, 0.78);
       }
 
-      #heroSection[data-theme="infinia"] .hero-settings-arrow {
+      #heroSection[data-theme="infinia"] .hero-settings-arrow,
+      #pageScroll[data-theme="infinia"] .hero-settings-arrow {
         color: rgba(255, 255, 255, 0.82);
       }
 
-      #heroSection[data-theme="infinia"] .hero-info-gradient {
+      #heroSection[data-theme="infinia"] .hero-info-gradient,
+      #pageScroll[data-theme="infinia"] .hero-info-gradient {
         background: linear-gradient(180deg, rgba(3, 6, 18, 0) 0%, #030612 42%);
       }
 
@@ -225,6 +241,9 @@
 
       #pageScroll {
         --intro-info-shift: 0px;
+        --hero-scale-width: 360px;
+        --hero-info-top: calc(var(--hero-scale-width) * 380 / 360);
+        --card-settings-content-shift: 0px;
         overscroll-behavior-y: none;
       }
 
@@ -259,82 +278,83 @@
       #heroSection {
         container-type: inline-size;
         container-name: hero;
+        --hero-scale-width: min(100cqw, 430px);
         --card-settings-panel-space: 156px;
         --card-settings-content-shift: 0px;
         --card-settings-card-shift: 0px;
-        height: calc(100cqw * 556 / 360 + var(--card-settings-panel-space));
+        height: calc(var(--hero-scale-width) * 556 / 360 + var(--card-settings-panel-space));
         transition:
           height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
           background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
       #cardsViewport {
-        height: calc(100cqw * 779 / 360);
+        height: calc(var(--hero-scale-width) * 779 / 360);
       }
 
       .hero-cards-viewport > div:nth-child(1) {
-        height: calc(100cqw * 779 / 360);
+        height: calc(var(--hero-scale-width) * 779 / 360);
       }
 
       .hero-cards-viewport > div:nth-child(2) {
-        height: calc(100cqw * 775 / 360);
+        height: calc(var(--hero-scale-width) * 775 / 360);
       }
 
       .hero-filter-chip-row {
-        top: calc(100cqw * 54 / 360);
+        top: calc(var(--hero-scale-width) * 54 / 360);
       }
 
       #heroCardDots {
-        top: calc(100cqw * -8 / 360);
+        top: calc(var(--hero-scale-width) * -8 / 360);
       }
 
       #heroInfoLayer .hero-credit-limit-label,
       #heroInfoLayer .hero-credit-secondary {
-        font-size: calc(100cqw * 10 / 360);
+        font-size: calc(var(--hero-scale-width) * 10 / 360);
       }
 
       #heroInfoLayer .hero-credit-amount {
-        font-size: calc(100cqw * 24 / 360);
+        font-size: calc(var(--hero-scale-width) * 24 / 360);
       }
 
       #heroInfoLayer .hero-chip-pan {
-        font-size: calc(100cqw * 12 / 360);
+        font-size: calc(var(--hero-scale-width) * 12 / 360);
       }
 
       #heroInfoLayer .hero-chip-brand-slot {
-        height: calc(100cqw * 18 / 360);
-        width: calc(100cqw * 28 / 360);
+        height: calc(var(--hero-scale-width) * 18 / 360);
+        width: calc(var(--hero-scale-width) * 28 / 360);
       }
 
       #heroInfoLayer .hero-chip-card-millennia {
-        height: calc(100cqw * 18 / 360);
-        width: calc(100cqw * 28 / 360);
+        height: calc(var(--hero-scale-width) * 18 / 360);
+        width: calc(var(--hero-scale-width) * 28 / 360);
       }
 
       #heroInfoLayer .hero-chip-copy {
-        width: calc(100cqw * 16 / 360);
-        height: calc(100cqw * 16 / 360);
+        width: calc(var(--hero-scale-width) * 16 / 360);
+        height: calc(var(--hero-scale-width) * 16 / 360);
       }
 
       #heroInfoLayer .hero-infinia-details-img {
-        max-width: calc(100cqw * 180 / 360);
+        max-width: calc(var(--hero-scale-width) * 180 / 360);
       }
 
       .hero-card-loading-msg {
-        top: calc(100cqw * 260 / 360);
-        font-size: calc(100cqw * 12 / 360);
+        top: calc(var(--hero-scale-width) * 260 / 360);
+        font-size: calc(var(--hero-scale-width) * 12 / 360);
       }
 
       .hero-cards-viewport {
         touch-action: pan-x pan-y;
         scroll-snap-type: x mandatory;
-        scroll-behavior: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
         transform: translateY(var(--card-settings-card-shift));
       }
 
       .hero-cards-viewport > div {
         scroll-snap-align: start;
-        scroll-snap-stop: always;
       }
 
       .sequence-frame canvas {
@@ -413,35 +433,59 @@
         pointer-events: none;
       }
 
-      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia {
+      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia,
+      #pageScroll[data-theme="millennia"] #cardSettingsPanel .card-settings-art-millennia {
         opacity: 1;
         pointer-events: auto;
       }
 
-      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia {
+      #heroSection[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia,
+      #pageScroll[data-theme="millennia"] #cardSettingsPanel .card-settings-art-infinia {
         opacity: 0;
         pointer-events: none;
       }
 
-      #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-millennia {
+      #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-millennia,
+      #pageScroll[data-theme="infinia"] #cardSettingsPanel .card-settings-art-millennia {
         opacity: 0;
         pointer-events: none;
       }
 
-      #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-infinia {
+      #heroSection[data-theme="infinia"] #cardSettingsPanel .card-settings-art-infinia,
+      #pageScroll[data-theme="infinia"] #cardSettingsPanel .card-settings-art-infinia {
         opacity: 1;
         pointer-events: auto;
       }
 
       #heroInfoLayer {
-        top: calc(100cqw * 380 / 360);
+        top: var(--hero-info-top);
+        height: auto;
+        min-height: max-content;
+        left: 0;
+        right: 0;
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         transform: translateY(calc(var(--card-settings-content-shift) + var(--intro-info-shift)));
         transition: none;
       }
 
+      #heroInfoLayer > * {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
       #contentFrame {
-        transform: translateY(var(--intro-info-shift));
-        margin-bottom: var(--intro-info-shift);
+        margin-top: var(--content-frame-margin-top, 16px);
+        width: 100%;
+        max-width: 100%;
+        transform: none;
+        margin-bottom: 0;
         transition: none;
       }
 
@@ -475,8 +519,8 @@
 
       .hero-card-dots__dot {
         box-sizing: border-box;
-        height: calc(100cqw * 6 / 360);
-        width: calc(100cqw * 6 / 360);
+        height: calc(var(--hero-scale-width) * 6 / 360);
+        width: calc(var(--hero-scale-width) * 6 / 360);
         flex-shrink: 0;
         border-radius: 9999px;
         padding: 0;
@@ -494,25 +538,30 @@
         box-shadow: 0 0 0 2px rgba(28, 63, 202, 0.35);
       }
 
-      #heroSection[data-theme="infinia"] .hero-card-dots__dot:focus-visible {
+      #heroSection[data-theme="infinia"] .hero-card-dots__dot:focus-visible,
+      #pageScroll[data-theme="infinia"] .hero-card-dots__dot:focus-visible {
         box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
       }
 
-      #heroSection[data-theme="millennia"] .hero-card-dots__dot {
+      #heroSection[data-theme="millennia"] .hero-card-dots__dot,
+      #pageScroll[data-theme="millennia"] .hero-card-dots__dot {
         background: rgba(17, 24, 39, 0.22);
       }
 
-      #heroSection[data-theme="millennia"] .hero-card-dots__dot--active {
-        width: calc(100cqw * 18 / 360);
+      #heroSection[data-theme="millennia"] .hero-card-dots__dot--active,
+      #pageScroll[data-theme="millennia"] .hero-card-dots__dot--active {
+        width: calc(var(--hero-scale-width) * 18 / 360);
         background: #1c3fca;
       }
 
-      #heroSection[data-theme="infinia"] .hero-card-dots__dot {
+      #heroSection[data-theme="infinia"] .hero-card-dots__dot,
+      #pageScroll[data-theme="infinia"] .hero-card-dots__dot {
         background: rgba(163, 163, 163, 0.45);
       }
 
-      #heroSection[data-theme="infinia"] .hero-card-dots__dot--active {
-        width: calc(100cqw * 18 / 360);
+      #heroSection[data-theme="infinia"] .hero-card-dots__dot--active,
+      #pageScroll[data-theme="infinia"] .hero-card-dots__dot--active {
+        width: calc(var(--hero-scale-width) * 18 / 360);
         background: #a3a3a3;
       }
     </style>
@@ -522,15 +571,31 @@
       class="flex min-h-[100dvh] w-full min-w-0 flex-col items-stretch bg-white md:min-h-screen md:flex-row md:items-center md:justify-center md:bg-[#eef2f7] md:p-6"
     >
       <div
-        class="relative mx-auto h-[100dvh] w-full min-w-0 max-w-full overflow-hidden bg-white md:mx-0 md:h-[844px] md:w-[360px] md:max-w-[360px] md:flex-shrink-0 md:shadow-[0_24px_64px_rgba(15,23,42,0.18)]"
+        class="relative mx-auto h-[100dvh] w-full min-w-0 max-w-[430px] overflow-hidden bg-white md:mx-0 md:h-[844px] md:w-[430px] md:flex-shrink-0 md:shadow-[0_24px_64px_rgba(15,23,42,0.18)]"
       >
         <main
           id="pageScroll"
           data-theme="millennia"
           class="hide-scrollbar absolute inset-0 overflow-y-auto overflow-x-hidden"
-          style="padding-bottom: 80px;"
+          style="padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));"
         >
           <section id="heroSection" data-theme="millennia" class="hero-theme relative overflow-hidden">
+            <script>
+              (function () {
+                try {
+                  var params = new URLSearchParams(window.location.search || "");
+                  var raw = (params.get("card") || "").toLowerCase().trim();
+                  var theme = "millennia";
+                  if (raw === "infinia" || raw === "inifnia") theme = "infinia";
+                  else if (raw === "millennia" || raw === "millenia") theme = "millennia";
+                  else if (raw) return;
+                  var ps = document.getElementById("pageScroll");
+                  var hs = document.getElementById("heroSection");
+                  if (ps) ps.setAttribute("data-theme", theme);
+                  if (hs) hs.setAttribute("data-theme", theme);
+                } catch (_) {}
+              })();
+            </script>
             <div
               id="cardsViewport"
               class="hero-cards-viewport hide-scrollbar absolute left-0 top-0 flex w-full overflow-x-auto overflow-y-hidden"
@@ -559,6 +624,29 @@
                 </div>
               </div>
             </div>
+            <script>
+              (function () {
+                try {
+                  var params = new URLSearchParams(window.location.search || "");
+                  var raw = (params.get("card") || "").toLowerCase().trim();
+                  var idx = 0;
+                  if (raw === "infinia" || raw === "inifnia") idx = 1;
+                  else if (raw === "millennia" || raw === "millenia") idx = 0;
+                  else if (raw) return;
+                  var cv = document.getElementById("cardsViewport");
+                  if (!cv) return;
+                  var w = cv.clientWidth;
+                  if (!w) return;
+                  var prevSnap = cv.style.scrollSnapType;
+                  var prevBehavior = cv.style.scrollBehavior;
+                  cv.style.scrollSnapType = "none";
+                  cv.style.scrollBehavior = "auto";
+                  cv.scrollLeft = w * idx;
+                  cv.style.scrollSnapType = prevSnap;
+                  cv.style.scrollBehavior = prevBehavior;
+                } catch (_) {}
+              })();
+            </script>
 
             <div class="absolute left-0 top-0 z-20 w-full overflow-hidden">
               <svg id="topBarSvg" class="block h-auto w-full" viewBox="0 0 360 55" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -648,7 +736,7 @@
 
             <div
               id="heroInfoLayer"
-              class="hero-info-gradient absolute left-0 z-20 w-full overflow-visible px-[16px] pb-[24px] pt-[8px]"
+              class="hero-info-gradient absolute left-0 z-20 w-full overflow-visible px-0 pb-[16px] pt-[0px]"
             >
               <div
                 id="heroCardDots"
@@ -792,7 +880,7 @@
             </div>
           </section>
 
-          <section id="contentFrame" class="relative z-30 -mt-[16px] overflow-visible rounded-t-[24px] bg-white pb-[12px] pt-[2px]">
+          <section id="contentFrame" class="relative z-0 overflow-visible rounded-t-[24px] bg-white pb-[52px] pt-[2px]">
             <img
               id="contentFrameTopDesign"
               alt=""
@@ -1080,6 +1168,8 @@
         var pageScroll = document.getElementById("pageScroll");
         var cardsViewport = document.getElementById("cardsViewport");
         var heroSection = document.getElementById("heroSection");
+        var heroInfoLayer = document.getElementById("heroInfoLayer");
+        var contentFrame = document.getElementById("contentFrame");
         var cardSettingsToggle = document.getElementById("cardSettingsToggle");
         var cardSettingsPanel = document.getElementById("cardSettingsPanel");
         var heroCardDots = document.getElementById("heroCardDots");
@@ -1114,7 +1204,7 @@
           },
         ];
 
-        var activeIndex = 0;
+        var activeIndex = getInitialCardIndexFromUrl();
         var introDistance = Math.max(65 * 20, 1200);
         var touchStartX = 0;
         var touchStartY = 0;
@@ -1124,6 +1214,7 @@
         var touchIntroLocked = false;
         var carouselSnapTimer = 0;
         var carouselAnimFrame = 0;
+        var contentFrameAnchorTimer = 0;
         var isCarouselAnimating = false;
         var introAnimFrame = 0;
 
@@ -1259,10 +1350,18 @@
         }
 
         function applyInitialCardFromUrl() {
-          if (!cardsViewport || !cardsViewport.clientWidth) return;
+          if (!cardsViewport) return;
+          var cw = cardsViewport.clientWidth;
+          if (!cw) return;
           var initialIndex = getInitialCardIndexFromUrl();
           activeIndex = initialIndex;
-          cardsViewport.scrollLeft = (cardsViewport.clientWidth || 1) * initialIndex;
+          var prevSnap = cardsViewport.style.scrollSnapType;
+          var prevBehavior = cardsViewport.style.scrollBehavior;
+          cardsViewport.style.scrollSnapType = "none";
+          cardsViewport.style.scrollBehavior = "auto";
+          cardsViewport.scrollLeft = cw * initialIndex;
+          cardsViewport.style.scrollSnapType = prevSnap;
+          cardsViewport.style.scrollBehavior = prevBehavior;
           setTheme(initialIndex);
         }
 
@@ -1289,8 +1388,9 @@
           paintCardDots();
         }
 
-        function easeInQuad(t) {
-          return t * t;
+        function easeOutCubic(t) {
+          var p = 1 - t;
+          return 1 - p * p * p;
         }
 
         function animateCarouselToIndex(index) {
@@ -1312,13 +1412,13 @@
 
           isCarouselAnimating = true;
           var startTime = 0;
-          var duration = 85;
+          var duration = Math.max(90, Math.min(140, 90 + Math.abs(delta) * 0.08));
 
           function step(timestamp) {
             if (!startTime) startTime = timestamp;
             var elapsed = timestamp - startTime;
             var progress = Math.min(1, elapsed / duration);
-            var eased = easeInQuad(progress);
+            var eased = easeOutCubic(progress);
 
             cardsViewport.scrollLeft = startLeft + delta * eased;
             updateActiveCard();
@@ -1344,7 +1444,7 @@
           carouselSnapTimer = window.setTimeout(function () {
             if (isCarouselAnimating) return;
             animateCarouselToIndex(getActiveIndex());
-          }, 28);
+          }, 90);
         }
 
         function syncIntroMotion() {
@@ -1356,6 +1456,31 @@
           pageScroll.style.setProperty("--intro-info-shift", infoShift.toFixed(3) + "px");
         }
 
+        function updateContentFrameAnchor() {
+          if (!contentFrame) return;
+          contentFrame.style.setProperty("--content-frame-margin-top", "16px");
+        }
+
+        function updateHeroInfoLayerLayoutVars() {
+          if (!pageScroll || !heroSection) return;
+          var heroScale = Math.min(heroSection.clientWidth || 360, 430);
+          pageScroll.style.setProperty("--hero-scale-width", heroScale.toFixed(2) + "px");
+          pageScroll.style.setProperty("--hero-info-top", (heroScale * 380 / 360).toFixed(2) + "px");
+        }
+
+        function scheduleContentFrameAnchorUpdate() {
+          updateHeroInfoLayerLayoutVars();
+          updateContentFrameAnchor();
+          if (contentFrameAnchorTimer) {
+            window.clearTimeout(contentFrameAnchorTimer);
+          }
+          contentFrameAnchorTimer = window.setTimeout(function () {
+            updateHeroInfoLayerLayoutVars();
+            updateContentFrameAnchor();
+            contentFrameAnchorTimer = 0;
+          }, 340);
+        }
+
         function canAnimateIntroForDelta(deltaY) {
           if (deltaY === 0) return false;
           if (pageScroll.scrollTop > 0) return false;
@@ -1365,6 +1490,21 @@
             return card.progress < 0.999 || card.targetProgress < 0.999;
           }
           return card.progress > 0.001 || card.targetProgress > 0.001;
+        }
+
+        function animateActiveCardToProgress(targetProgress, durationMs) {
+          var card = cards[activeIndex];
+          if (!card) return false;
+          var target = clamp01(targetProgress);
+          if (Math.abs(card.progress - target) < 0.0004 && Math.abs(card.targetProgress - target) < 0.0004) {
+            return false;
+          }
+          card.animStartProgress = card.progress;
+          card.animStartTime = 0;
+          card.animDuration = Math.max(120, durationMs || 280);
+          card.targetProgress = target;
+          startIntroAnimation();
+          return true;
         }
 
         function animateIntroToEdge(deltaY) {
@@ -1495,6 +1635,7 @@
           cards.forEach(resizeCanvas);
           updateActiveCard();
           syncIntroMotion();
+          scheduleContentFrameAnchorUpdate();
         }
 
         function setCardSettingsOpen(isOpen) {
@@ -1505,6 +1646,19 @@
           heroSection.style.setProperty("--card-settings-panel-space", isOpen ? "156px" : "0px");
           heroSection.style.setProperty("--card-settings-content-shift", "0px");
           heroSection.style.setProperty("--card-settings-card-shift", "0px");
+          var card = cards[activeIndex];
+          if (isOpen) {
+            var startsAtFirstFrame = !!card && card.progress <= 0.001 && card.targetProgress <= 0.001;
+            if (startsAtFirstFrame) {
+              animateActiveCardToProgress(1, 280);
+            }
+          } else {
+            var startsAtLastFrame = !!card && card.progress >= 0.999 && card.targetProgress >= 0.999;
+            if (startsAtLastFrame) {
+              animateActiveCardToProgress(0, 280);
+            }
+          }
+          scheduleContentFrameAnchorUpdate();
         }
 
         cards.forEach(function (card) {
@@ -1519,10 +1673,18 @@
         applyInitialCardFromUrl();
         updateActiveCard();
         syncIntroMotion();
-        setCardSettingsOpen(true);
-        window.setTimeout(function () {
-          setCardSettingsOpen(false);
-        }, 1000);
+        setCardSettingsOpen(false);
+        if (pageScroll && heroInfoLayer && heroInfoLayer.parentElement !== pageScroll) {
+          if (contentFrame && contentFrame.parentElement === pageScroll) {
+            pageScroll.insertBefore(heroInfoLayer, contentFrame);
+          } else {
+            pageScroll.appendChild(heroInfoLayer);
+          }
+        }
+        if (heroInfoLayer && contentFrame && contentFrame.parentElement !== heroInfoLayer) {
+          heroInfoLayer.appendChild(contentFrame);
+        }
+        scheduleContentFrameAnchorUpdate();
 
         if (cardSettingsToggle) {
           cardSettingsToggle.addEventListener("click", function () {
