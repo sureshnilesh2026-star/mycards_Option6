@@ -536,6 +536,35 @@
         transform: translateY(-12px);
       }
 
+      /* Fixed top bar: frosted glass over scrolling hero content */
+      .hero-top-bar {
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        -webkit-backdrop-filter: blur(14px) saturate(165%);
+        backdrop-filter: blur(14px) saturate(165%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      }
+
+      #heroSection[data-theme="millennia"] .hero-top-bar {
+        background: rgba(255, 255, 255, 0.52);
+      }
+
+      #heroSection[data-theme="infinia"] .hero-top-bar {
+        background: rgba(8, 14, 35, 0.5);
+        border-bottom-color: rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+        #heroSection[data-theme="millennia"] .hero-top-bar {
+          background: rgba(255, 255, 255, 0.92);
+        }
+        #heroSection[data-theme="infinia"] .hero-top-bar {
+          background: rgba(8, 14, 35, 0.92);
+        }
+      }
+
       #topBarSvg > path,
       #topBarSvg > rect,
       #topBarSvg > circle,
@@ -692,7 +721,9 @@
               })();
             </script>
 
-            <div class="absolute left-0 top-0 z-20 w-full overflow-hidden">
+            <div
+              class="hero-top-bar fixed left-1/2 top-0 z-40 w-full max-w-[430px] -translate-x-1/2 overflow-hidden"
+            >
               <svg id="topBarSvg" class="block h-auto w-full" viewBox="0 0 360 55" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <path d="M27.104 21.4754C26.2856 20.1064 25.1738 19.025 23.7691 18.2314C22.3645 17.4379 20.8299 17.041 19.1658 17.041C17.9246 17.041 16.7379 17.2753 15.6059 17.7441C14.4739 18.2128 13.4987 18.8463 12.6803 19.6445C11.8618 20.4428 11.2106 21.3919 10.7264 22.4917C10.2421 23.5916 10 24.7449 10 25.9516C10 27.3438 10.3085 28.6484 10.9257 29.8643C11.543 31.0801 12.3868 32.1012 13.4576 32.9273C13.3825 33.2985 13.2938 33.6513 13.1915 33.9852C13.0892 34.3194 12.8887 34.6077 12.817 34.7143C12.7455 34.8211 12.6052 34.9792 12.4415 35.2248C12.2779 35.471 12.1539 35.6128 12.1062 35.6872C12.0993 35.6915 12.0721 35.7336 12.0244 35.8124C11.9767 35.8911 11.9527 35.9305 11.9527 35.9305L11.8914 36.0557C11.8572 36.1255 11.8419 36.1695 11.8453 36.1877C11.8487 36.2059 11.8419 36.2526 11.8248 36.3267C11.8077 36.4011 11.8095 36.4569 11.8299 36.4941V36.508C11.8573 36.6752 11.917 36.8097 12.009 36.9116C12.101 37.0136 12.2051 37.0555 12.321 37.0366C12.7644 36.9624 13.1235 36.8287 13.4576 36.6985C15.2444 36.0763 15.7806 35.6676 17.6824 34.7504C18.1938 34.8246 18.6882 34.8619 19.1656 34.8619C20.8296 34.8619 22.3642 34.465 23.769 33.6712C25.1738 32.8776 26.2854 31.7962 27.1037 30.4274C27.9222 29.0589 28.3313 27.5666 28.3313 25.9516C28.3314 24.3365 27.9222 22.8443 27.104 21.4755L27.104 21.4754Z" stroke="#202E66"/>
                 <mask id="mask0_4657_62951" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="13" y="19" width="13" height="14">

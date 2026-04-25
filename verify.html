@@ -146,7 +146,7 @@
       /* Top chrome: MyCards redesign app header (360×55), same asset as card.html; dark band so white artwork reads */
       #verify-top-bar {
         height: 55px;
-        transform: translateY(-100%);
+        transform: translate(-50%, -100%);
         transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
         background: linear-gradient(135deg, #0c101f 0%, #131b34 50%, #1a2545 100%);
         line-height: 0;
@@ -163,11 +163,11 @@
         object-position: left top;
       }
       #verify-top-bar.verify-top-bar--in {
-        transform: translateY(0);
+        transform: translate(-50%, 0);
       }
       @media (prefers-reduced-motion: reduce) {
         #verify-top-bar {
-          transform: translateY(0);
+          transform: translate(-50%, 0);
           transition: none;
         }
       }
@@ -443,7 +443,7 @@
       <div
         id="verify-top-bar"
         aria-hidden="true"
-        class="absolute left-0 top-0 right-0 w-full overflow-hidden z-[100] pointer-events-none"
+        class="fixed left-1/2 top-0 right-auto w-full max-w-[430px] overflow-hidden z-[100] pointer-events-none"
       >
         <img
           src="assets/mycards-app-header.svg"
@@ -709,6 +709,46 @@
           document.getElementById("card-infinia"),
           document.getElementById("card-millenia"),
         ];
+        /* Preload all card animation frames (off-screen) so next screen opens without frame fetch lag. */
+        var VERIFY_FRAME_COUNT = 120;
+        var verifyFramePreloadCache = [];
+        var verifyFramePreloadSummary = { total: 0, loaded: 0, failed: 0 };
+        function buildAnimationFrameManifest() {
+          var manifest = [];
+          for (var i = 1; i <= VERIFY_FRAME_COUNT; i++) {
+            var idx = String(i).padStart(4, "0");
+            manifest.push("assets/animation/infinia_card/Infinia Card" + idx + ".png");
+            manifest.push("assets/animation/millennia_card/Millennia Card" + idx + ".png");
+          }
+          return manifest;
+        }
+        function preloadAnimationFrame(url) {
+          return new Promise(function (resolve) {
+            var img = new Image();
+            img.decoding = "async";
+            img.onload = function () {
+              verifyFramePreloadSummary.loaded += 1;
+              resolve(true);
+            };
+            img.onerror = function () {
+              verifyFramePreloadSummary.failed += 1;
+              resolve(false);
+            };
+            img.src = url;
+            /* Keep references alive for this page lifecycle so preloaded frames stay warm. */
+            verifyFramePreloadCache.push(img);
+          });
+        }
+        function preloadAllAnimationFrames() {
+          var urls = buildAnimationFrameManifest();
+          verifyFramePreloadSummary.total = urls.length;
+          var jobs = [];
+          for (var ui = 0; ui < urls.length; ui++) {
+            jobs.push(preloadAnimationFrame(urls[ui]));
+          }
+          return Promise.allSettled(jobs);
+        }
+        window.verifyAnimationFramesReady = preloadAllAnimationFrames();
         /* Slugs for new_cards.html?card=… (same order as cards[]). */
         var CARD_SLUGS = ["infinia", "millennia"];
         var isVerifying = false;
