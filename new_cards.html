@@ -127,7 +127,8 @@
       }
 
       #heroSection[data-theme="infinia"] {
-        background: linear-gradient(180deg, #041231 0%, #051e47 50%, #010513 100%);
+        background-color: #010513;
+        background-image: linear-gradient(180deg, #041231 0%, #051e47 50%, #010513 100%);
       }
 
       #heroSection[data-theme="millennia"] .hero-text-primary,
@@ -215,6 +216,43 @@
         color: rgba(255, 255, 255, 0.82);
       }
 
+      /* Top bar SVG ink: same palette as hero text below (updates live with data-theme). */
+      #heroSection[data-theme="millennia"],
+      #pageScroll[data-theme="millennia"] {
+        --hero-top-bar-stroke: #202e66;
+        --hero-top-bar-stroke-muted: #3b4555;
+        --hero-top-bar-fill: #202e66;
+        --hero-top-bar-ink: #111827;
+        --hero-top-bar-accent: #dc2626;
+      }
+
+      #heroSection[data-theme="infinia"],
+      #pageScroll[data-theme="infinia"] {
+        --hero-top-bar-stroke: #ffffff;
+        --hero-top-bar-stroke-muted: rgba(255, 255, 255, 0.82);
+        --hero-top-bar-fill: #ffffff;
+        --hero-top-bar-ink: #ffffff;
+        --hero-top-bar-accent: #fca5a5;
+      }
+
+      /* Scroll-driven contrast (see syncTopBarScrollInk): content under the bar is dark → white (#fff) text/icons;
+         content under the bar is light → dark (#111827 / navy strokes) for readability. */
+      #pageScroll[data-theme="millennia"][data-top-bar-ink="light"] {
+        --hero-top-bar-stroke: #ffffff;
+        --hero-top-bar-stroke-muted: rgba(255, 255, 255, 0.82);
+        --hero-top-bar-fill: #ffffff;
+        --hero-top-bar-ink: #ffffff;
+        --hero-top-bar-accent: #fca5a5;
+      }
+
+      #pageScroll[data-theme="infinia"][data-top-bar-ink="dark"] {
+        --hero-top-bar-stroke: #202e66;
+        --hero-top-bar-stroke-muted: #3b4555;
+        --hero-top-bar-fill: #202e66;
+        --hero-top-bar-ink: #111827;
+        --hero-top-bar-accent: #dc2626;
+      }
+
       #heroSection[data-theme="infinia"] .hero-info-gradient,
       #pageScroll[data-theme="infinia"] .hero-info-gradient {
         background: linear-gradient(180deg, rgba(3, 6, 18, 0) 0%, #030612 42%);
@@ -286,7 +324,7 @@
         --card-settings-card-shift: 0px;
         height: calc(var(--hero-scale-width) * 556 / 360 + var(--card-settings-panel-space));
         transition:
-          height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+          height 0.42s cubic-bezier(0.33, 1, 0.32, 1),
           background 0.42s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
 
@@ -431,11 +469,11 @@
         transform: translateY(0);
         box-sizing: border-box;
         transition:
-          max-height 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
-          margin-bottom 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
-          padding-top 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
-          opacity 0.2s ease,
-          transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+          max-height 0.42s cubic-bezier(0.33, 1, 0.32, 1),
+          margin-bottom 0.42s cubic-bezier(0.33, 1, 0.32, 1),
+          padding-top 0.42s cubic-bezier(0.33, 1, 0.32, 1),
+          opacity 0.42s cubic-bezier(0.33, 1, 0.32, 1),
+          transform 0.42s cubic-bezier(0.33, 1, 0.32, 1);
       }
 
       #cardSettingsPanel[data-open="false"] {
@@ -443,7 +481,7 @@
         padding-top: 0;
         margin-bottom: 0;
         opacity: 0;
-        transform: translateY(-8px);
+        transform: translateY(0);
       }
 
       .card-settings-art-wrap {
@@ -536,54 +574,72 @@
         transform: translateY(-12px);
       }
 
-      /* Fixed top bar: frosted glass over scrolling hero content */
+      /* Fixed top bar: neutral (no tint) glass — blur only, minimal transparent veil for backdrop-filter */
       .hero-top-bar {
         box-sizing: border-box;
         padding-top: env(safe-area-inset-top, 0px);
-        -webkit-backdrop-filter: blur(14px) saturate(165%);
-        backdrop-filter: blur(14px) saturate(165%);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.22);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      }
-
-      #heroSection[data-theme="millennia"] .hero-top-bar {
-        background: rgba(255, 255, 255, 0.52);
-      }
-
-      #heroSection[data-theme="infinia"] .hero-top-bar {
-        background: rgba(8, 14, 35, 0.5);
-        border-bottom-color: rgba(255, 255, 255, 0.08);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        color: var(--hero-top-bar-ink);
+        background: rgba(255, 255, 255, 0.06);
+        -webkit-backdrop-filter: blur(20px) saturate(140%);
+        backdrop-filter: blur(20px) saturate(140%);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
       }
 
       @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-        #heroSection[data-theme="millennia"] .hero-top-bar {
-          background: rgba(255, 255, 255, 0.92);
-        }
-        #heroSection[data-theme="infinia"] .hero-top-bar {
-          background: rgba(8, 14, 35, 0.92);
+        .hero-top-bar {
+          background: rgba(248, 250, 252, 0.92);
         }
       }
 
-      #topBarSvg > path,
-      #topBarSvg > rect,
-      #topBarSvg > circle,
-      #topBarSvg > g path {
-        transition: fill 0.2s ease, stroke 0.2s ease;
+      /* Infinia: slightly darker glass so the bar reads against the deep blue hero. */
+      #heroSection[data-theme="infinia"] .hero-top-bar,
+      #pageScroll[data-theme="infinia"] .hero-top-bar {
+        background: rgba(4, 18, 49, 0.4);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        -webkit-backdrop-filter: blur(22px) saturate(130%);
+        backdrop-filter: blur(22px) saturate(130%);
       }
 
-      #heroSection[data-theme="infinia"] #topBarSvg > path[stroke="#202E66"],
-      #heroSection[data-theme="infinia"] #topBarSvg > path[stroke="#3B4355"],
-      #heroSection[data-theme="infinia"] #topBarSvg > rect[stroke="#3B4355"],
-      #heroSection[data-theme="infinia"] #topBarSvg > path[stroke="#202E66"] {
-        stroke: rgba(255, 255, 255, 0.9);
+      @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+        #heroSection[data-theme="infinia"] .hero-top-bar,
+        #pageScroll[data-theme="infinia"] .hero-top-bar {
+          background: rgba(15, 23, 42, 0.9);
+        }
       }
 
-      #heroSection[data-theme="infinia"] #topBarSvg > path[fill="#202E66"],
-      #heroSection[data-theme="infinia"] #topBarSvg > path[fill="black"],
-      #heroSection[data-theme="infinia"] #topBarSvg > circle[fill="black"],
-      #heroSection[data-theme="infinia"] #topBarSvg > g path[fill="#202E66"] {
-        fill: #ffffff;
+      #topBarSvg path,
+      #topBarSvg rect,
+      #topBarSvg circle {
+        transition:
+          fill 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+          stroke 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      /* Strokes: map authored hex values to theme vars (do not target defs/mask internals). */
+      #topBarSvg path[stroke="#202E66"],
+      #topBarSvg rect[stroke="#202E66"] {
+        stroke: var(--hero-top-bar-stroke);
+      }
+
+      #topBarSvg path[stroke="#3B4355"],
+      #topBarSvg rect[stroke="#3B4355"] {
+        stroke: var(--hero-top-bar-stroke-muted);
+      }
+
+      #topBarSvg path[fill="#202E66"],
+      #topBarSvg g path[fill="#202E66"] {
+        fill: var(--hero-top-bar-fill);
+      }
+
+      #topBarSvg > path[fill="black"],
+      #topBarSvg > circle[fill="black"] {
+        fill: var(--hero-top-bar-ink);
+      }
+
+      #topBarSvg > path[fill="#FF0000"] {
+        fill: var(--hero-top-bar-accent);
       }
 
       .hero-card-dots__dot {
@@ -1297,6 +1353,8 @@
         var isCarouselAnimating = false;
         var introAnimFrame = 0;
         var horizontalFrameEnd = 60;
+        /* Must match #heroSection / #cardSettingsPanel height transition (0.42s). */
+        var SETTINGS_ANIM_MS = 420;
 
         function pad4(n) {
           return String(n).padStart(4, "0");
@@ -1334,7 +1392,9 @@
         }
 
         function drawCard(card) {
-          var frameIndex = Math.floor((card.frameCount - 1) * card.progress + 0.0001);
+          var maxFi = card.frameCount - 1;
+          var fi = maxFi * clamp01(card.progress);
+          var frameIndex = Math.min(maxFi, Math.max(0, Math.round(fi)));
           if (frameIndex === card.lastDrawnFrame) return;
           var drawableIndex = resolveDrawableFrame(card, frameIndex);
           if (drawableIndex < 0) return;
@@ -1417,6 +1477,119 @@
           heroSection.setAttribute("data-theme", theme);
           if (pageScroll) pageScroll.setAttribute("data-theme", theme);
           currentThemeIndex = index;
+          scheduleTopBarScrollInk();
+        }
+
+        /** Sample content behind the glass top bar; flip SVG ink for readable contrast while scrolling. */
+        function linearizeChannel(c) {
+          c /= 255;
+          return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+        }
+
+        function relativeLuminanceFromRgb(r, g, b) {
+          return (
+            0.2126 * linearizeChannel(r) +
+            0.7152 * linearizeChannel(g) +
+            0.0722 * linearizeChannel(b)
+          );
+        }
+
+        function parseCssRgb(str) {
+          if (!str || str === "transparent") return null;
+          var m = str.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);
+          if (!m) return null;
+          return { r: +m[1], g: +m[2], b: +m[3], a: m[4] !== undefined ? +m[4] : 1 };
+        }
+
+        function effectiveBgLuminance(el) {
+          var hops = 0;
+          while (el && hops < 18) {
+            if (el === pageScroll || el === document.body) break;
+            var bg = window.getComputedStyle(el).backgroundColor;
+            var rgb = parseCssRgb(bg);
+            if (rgb && rgb.a >= 0.18) {
+              return relativeLuminanceFromRgb(rgb.r, rgb.g, rgb.b);
+            }
+            el = el.parentElement;
+            hops += 1;
+          }
+          return null;
+        }
+
+        function luminanceFromHitStack(stack) {
+          if (!stack || !stack.length) return null;
+          var si;
+          var node;
+          /* When main feed (#contentFrame) has scrolled under the bar, prefer it over the card
+             canvas sitting behind semi-transparent gradient layers — avoids white UI + white ink. */
+          if (contentFrame) {
+            for (si = 0; si < stack.length; si += 1) {
+              node = stack[si];
+              if (!node || node.nodeType !== 1) continue;
+              if (node.closest && node.closest(".hero-top-bar")) continue;
+              if (node.closest && node.closest("#contentFrame")) {
+                var lumCf = effectiveBgLuminance(node);
+                if (lumCf != null) return lumCf;
+              }
+            }
+          }
+          for (si = 0; si < stack.length; si += 1) {
+            node = stack[si];
+            if (!node || node.nodeType !== 1) continue;
+            if (node.closest && node.closest(".hero-top-bar")) continue;
+            var lum = effectiveBgLuminance(node);
+            if (lum != null) return lum;
+          }
+          return null;
+        }
+
+        function sampleLuminanceBehindTopBar() {
+          var bar = document.querySelector(".hero-top-bar");
+          if (!bar) return 0.82;
+          var r = bar.getBoundingClientRect();
+          if (!r.width || !r.height) return 0.82;
+          /* Sample near the bottom of the bar (closest to visible feed) and at mid-height. */
+          var yLow = Math.min(window.innerHeight - 1, Math.max(0, Math.floor(r.bottom - 2)));
+          var yMid = Math.min(window.innerHeight - 1, Math.max(0, Math.floor(r.top + r.height * 0.5)));
+          var xs = [r.left + r.width * 0.2, r.left + r.width * 0.5, r.left + r.width * 0.8];
+          var maxLum = 0;
+          var any = false;
+          for (var yi = 0; yi < 2; yi += 1) {
+            var y = yi === 0 ? yLow : yMid;
+            for (var xi = 0; xi < xs.length; xi += 1) {
+              var x = Math.floor(Math.min(window.innerWidth - 1, Math.max(0, xs[xi])));
+              var lum = luminanceFromHitStack(document.elementsFromPoint(x, y));
+              if (lum != null) {
+                any = true;
+                if (lum > maxLum) maxLum = lum;
+              }
+            }
+          }
+          return any ? maxLum : 0.82;
+        }
+
+        var topBarInkRaf = 0;
+
+        function syncTopBarScrollInk() {
+          topBarInkRaf = 0;
+          if (!pageScroll) return;
+          var theme = (pageScroll.getAttribute("data-theme") || "millennia").toLowerCase();
+          var lum = sampleLuminanceBehindTopBar();
+          /* Relative luminance of content behind the glass: low = dark bg → white bar fg; high = light bg → dark bar fg. */
+          var belowIsDark = lum < 0.48;
+          var isMillennia = theme === "millennia" || theme === "millenia";
+          if (isMillennia) {
+            if (belowIsDark) pageScroll.setAttribute("data-top-bar-ink", "light");
+            else pageScroll.removeAttribute("data-top-bar-ink");
+          } else {
+            if (!belowIsDark) pageScroll.setAttribute("data-top-bar-ink", "dark");
+            else pageScroll.removeAttribute("data-top-bar-ink");
+          }
+        }
+
+        function scheduleTopBarScrollInk() {
+          if (topBarInkRaf) return;
+          topBarInkRaf = window.requestAnimationFrame(syncTopBarScrollInk);
         }
 
         function getHorizontalRangeProgress(card) {
@@ -1443,6 +1616,7 @@
           if (Math.abs(nextProgress - card.progress) < 0.0001) return;
           card.progress = nextProgress;
           drawCard(card);
+          scheduleTopBarScrollInk();
         }
 
         function paintCardProgressFromCarousel() {
@@ -1538,6 +1712,12 @@
         function easeOutCubic(t) {
           var p = 1 - t;
           return 1 - p * p * p;
+        }
+
+        function easeInOutCubic(t) {
+          if (t < 0.5) return 4 * t * t * t;
+          var p = -2 * t + 2;
+          return 1 - (p * p * p) / 2;
         }
 
         function animateCarouselToIndex(index) {
@@ -1694,14 +1874,16 @@
 
             if (!card.animStartTime) {
               card.animStartTime = timestamp;
-              card.animStartProgress = card.progress;
+              /* Ease vertical motion only — composite card.progress includes horizontal and caused a visible jerk. */
+              card.animStartProgress = card.verticalProgress;
               if (!card.animDuration) card.animDuration = 260;
             }
 
             var elapsed = timestamp - card.animStartTime;
             var duration = card.animDuration || 260;
             var t = Math.max(0, Math.min(1, elapsed / duration));
-            card.verticalProgress = clamp01(card.animStartProgress + (target - card.animStartProgress) * t);
+            var te = easeInOutCubic(t);
+            card.verticalProgress = clamp01(card.animStartProgress + (target - card.animStartProgress) * te);
             refreshCardProgress(card);
             if (t < 1) {
               needsMore = true;
@@ -1731,6 +1913,7 @@
           if (animateIntroToEdge(event.deltaY)) {
             event.preventDefault();
           }
+          scheduleTopBarScrollInk();
         }
 
         function onTouchStart(event) {
@@ -1783,6 +1966,7 @@
           updateActiveCard();
           syncIntroMotion();
           scheduleContentFrameAnchorUpdate();
+          scheduleTopBarScrollInk();
         }
 
         function setCardSettingsOpen(isOpen) {
@@ -1794,15 +1978,16 @@
           heroSection.style.setProperty("--card-settings-content-shift", "0px");
           heroSection.style.setProperty("--card-settings-card-shift", "0px");
           var card = cards[activeIndex];
-          if (isOpen) {
-            var startsAtFirstFrame = !!card && card.verticalProgress <= 0.001 && card.verticalTarget <= 0.001;
-            if (startsAtFirstFrame) {
-              animateActiveCardToProgress(1, 280);
-            }
-          } else {
-            var startsAtLastFrame = !!card && card.verticalProgress >= 0.999 && card.verticalTarget >= 0.999;
-            if (startsAtLastFrame) {
-              animateActiveCardToProgress(0, 280);
+          /* Always tween canvas frames 61→120 (vertical segment) in lockstep with the white settings sheet. */
+          if (card) {
+            if (isOpen) {
+              if (card.verticalTarget < 0.999 || card.verticalProgress < 0.999) {
+                animateActiveCardToProgress(1, SETTINGS_ANIM_MS);
+              }
+            } else {
+              if (card.verticalTarget > 0.001 || card.verticalProgress > 0.001) {
+                animateActiveCardToProgress(0, SETTINGS_ANIM_MS);
+              }
             }
           }
           scheduleContentFrameAnchorUpdate();
@@ -1835,6 +2020,7 @@
           heroInfoLayer.appendChild(contentFrame);
         }
         scheduleContentFrameAnchorUpdate();
+        scheduleTopBarScrollInk();
 
         if (cardSettingsToggle) {
           cardSettingsToggle.addEventListener("click", function () {
@@ -1860,6 +2046,14 @@
             if (!isCarouselAnimating) {
               scheduleCarouselSnap();
             }
+            scheduleTopBarScrollInk();
+          },
+          { passive: true }
+        );
+        pageScroll.addEventListener(
+          "scroll",
+          function () {
+            scheduleTopBarScrollInk();
           },
           { passive: true }
         );
