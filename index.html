@@ -349,116 +349,9 @@
         -webkit-text-fill-color: transparent;
         outline: none;
       }
-      /* Layer debug: open page with ?layers=1 */
-      #layer-debug {
-        position: fixed;
-        top: 8px;
-        right: 8px;
-        z-index: 9999;
-        width: min(100vw - 16px, 280px);
-        max-height: min(70vh, 420px);
-        overflow: auto;
-        box-sizing: border-box;
-        padding: 10px 12px;
-        border-radius: 12px;
-        background: rgba(15, 23, 42, 0.92);
-        color: #e2e8f0;
-        font-size: 11px;
-        line-height: 1.35;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-        border: 1px solid rgba(148, 163, 184, 0.35);
-        -webkit-backdrop-filter: blur(8px);
-        backdrop-filter: blur(8px);
-      }
-      #layer-debug h2 {
-        margin: 0 0 8px;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #94a3b8;
-      }
-      #layer-debug table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      #layer-debug th,
-      #layer-debug td {
-        text-align: left;
-        padding: 4px 6px 4px 0;
-        vertical-align: top;
-        border-bottom: 1px solid rgba(51, 65, 85, 0.9);
-      }
-      #layer-debug th {
-        color: #cbd5e1;
-        font-weight: 600;
-        width: 38%;
-      }
-      #layer-debug code {
-        font-size: 10px;
-        color: #a5b4fc;
-        word-break: break-all;
-      }
-      #layer-debug button {
-        margin-top: 8px;
-        width: 100%;
-        padding: 6px 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(148, 163, 184, 0.5);
-        background: rgba(30, 41, 59, 0.9);
-        color: #f1f5f9;
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      #layer-debug button[aria-pressed="true"] {
-        background: #334155;
-        border-color: #94a3b8;
-      }
-      html.layers-debug-outlines [data-layer] {
-        outline: 2px dashed var(--layer-color, #f472b6);
-        outline-offset: -2px;
-      }
-      [data-layer="header"] {
-        --layer-color: #38bdf8;
-      }
-      [data-layer="hero"] {
-        --layer-color: #a78bfa;
-      }
-      [data-layer="login"] {
-        --layer-color: #34d399;
-      }
-      [data-layer="otp-backdrop"] {
-        --layer-color: #fbbf24;
-      }
-      [data-layer="otp-sheet"] {
-        --layer-color: #fb7185;
-      }
-      [data-layer="toast"] {
-        --layer-color: #e2e8f0;
-      }
     </style>
   </head>
   <body class="min-h-[100dvh] min-h-screen p-0 box-border w-full max-w-none">
-    <!--
-      PAGE LAYERS (stack inside .frame-root, then globals)
-
-      [Body — outside frame]
-        • White page chrome
-
-      [.frame-root — gradient phone column]
-        1. Header        data-layer="header"   z-30  (menu-header.svg + #btn-eva / #btn-menu)
-        2. Hero          data-layer="hero"     .hero-stack: fixed .hero-brand-lockup + #hero-carousel + dots
-        3. Login sheet   data-layer="login"    #login-sheet  z-20  (stays visible under OTP; frame lifts for keyboard)
-        4. OTP backdrop  data-layer="otp-backdrop"  #otp-backdrop  z-[45]
-        5. OTP sheet     data-layer="otp-sheet"     #otp-sheet     z-[50]  role="dialog"
-
-      [Fixed on viewport]
-        • Toast #toast   data-layer="toast"   z-50  (opacity 0 until shown; same z as OTP sheet — DOM order breaks ties)
-
-      Dev: append ?layers=1 to this URL for a live stack table + optional outlines.
-    -->
     <div class="frame-root relative w-full rounded-none pt-header sm:shadow-2xl">
       <!-- Top menu bar: exact Figma export (360×48), see assets/menu-header.svg -->
       <header class="fixed left-0 top-0 z-30 h-header w-full shrink-0 overflow-hidden" data-layer="header">
@@ -639,7 +532,7 @@
       <div
         id="otp-backdrop"
         data-layer="otp-backdrop"
-        class="absolute inset-0 bg-black/25 opacity-0 pointer-events-none transition-opacity duration-[320ms] ease-in-out z-[45]"
+        class="absolute inset-0 bg-black/60 opacity-0 pointer-events-none transition-opacity duration-[320ms] ease-in-out z-[45]"
         aria-hidden="true"
       ></div>
       <div
@@ -723,87 +616,7 @@
       </div>
     </div>
 
-    <div
-      id="toast"
-      data-layer="toast"
-      class="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-[90vw] px-4 py-2.5 rounded-lg bg-neutral-900 text-white text-sm shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50"
-      role="status"
-    ></div>
-
-    <div id="layer-debug" hidden></div>
-
     <script>
-      (function initLayerDebug() {
-        try {
-          var q = new URLSearchParams(window.location.search);
-          if (q.get("layers") !== "1" && q.get("layers") !== "true") return;
-        } catch (e) {
-          return;
-        }
-        var panel = document.getElementById("layer-debug");
-        if (!panel) return;
-        panel.hidden = false;
-
-        var rows = [
-          { label: "Header", el: document.querySelector('[data-layer="header"]'), note: "z-30" },
-          { label: "Hero", el: document.querySelector('[data-layer="hero"]'), note: "art z-10 inside" },
-          { label: "Login", el: document.getElementById("login-sheet"), note: "z-20" },
-          { label: "OTP dim", el: document.getElementById("otp-backdrop"), note: "z-45" },
-          { label: "OTP sheet", el: document.getElementById("otp-sheet"), note: "z-50" },
-          { label: "Toast", el: document.getElementById("toast"), note: "z-50 fixed" },
-        ];
-
-        function zOf(el) {
-          if (!el) return "—";
-          var z = window.getComputedStyle(el).zIndex;
-          return z === "auto" ? "auto" : z;
-        }
-
-        function otpOpen() {
-          var s = document.getElementById("otp-sheet");
-          return s && s.classList.contains("is-open");
-        }
-
-        function render() {
-          var tb = [];
-          tb.push("<h2>Layers (?layers=1)</h2>");
-          tb.push("<table><thead><tr><th>Layer</th><th>z-index</th></tr></thead><tbody>");
-          for (var i = 0; i < rows.length; i++) {
-            var r = rows[i];
-            tb.push(
-              "<tr><th>" +
-                r.label +
-                "</th><td><code>" +
-                zOf(r.el) +
-                "</code><br><span style='color:#64748b'>" +
-                r.note +
-                "</span></td></tr>"
-            );
-          }
-          tb.push("</tbody></table>");
-          tb.push(
-            "<p style='margin:8px 0 0;color:#94a3b8'>OTP open: <strong style='color:#e2e8f0'>" +
-              (otpOpen() ? "yes" : "no") +
-              "</strong></p>"
-          );
-          panel.innerHTML = tb.join("");
-          var btn = document.createElement("button");
-          btn.type = "button";
-          btn.textContent = "Outline layers";
-          btn.setAttribute("aria-pressed", document.documentElement.classList.contains("layers-debug-outlines") ? "true" : "false");
-          btn.addEventListener("click", function () {
-            var on = document.documentElement.classList.toggle("layers-debug-outlines");
-            btn.setAttribute("aria-pressed", on ? "true" : "false");
-          });
-          panel.appendChild(btn);
-        }
-
-        render();
-        var mo = new MutationObserver(render);
-        var otpSheet = document.getElementById("otp-sheet");
-        if (otpSheet) mo.observe(otpSheet, { attributes: true, attributeFilter: ["class"] });
-      })();
-
       (function initHeroCarousel() {
         var root = document.getElementById("hero-carousel");
         var track = document.getElementById("hero-carousel-track");
@@ -942,173 +755,41 @@
       })();
 
       (function () {
+        var frameRoot = document.querySelector(".frame-root");
+        var loginSheet = document.getElementById("login-sheet");
+        var mobile = document.getElementById("mobile");
+        var hint = document.getElementById("input-hint");
         var infoText = document.getElementById("info-text");
+        var btnOtp = document.getElementById("btn-otp");
         var otpSheet = document.getElementById("otp-sheet");
         var otpBackdrop = document.getElementById("otp-backdrop");
         var otpLast4 = document.getElementById("otp-last4");
         var otpVerifyBtn = document.getElementById("otp-verify");
-        var otpResend = document.getElementById("otp-resend");
-        var otpCodeField = document.getElementById("otp-code-field");
         var otpRaw = document.getElementById("otp-raw");
+        var otpCodeField = document.getElementById("otp-code-field");
         var otpDotNodes = otpCodeField
           ? Array.prototype.slice.call(otpCodeField.querySelectorAll(".otp-code-dot"), 0)
           : [];
-
-        function otpDigits() {
-          if (!otpRaw) return "";
-          return (otpRaw.value || "").replace(/\D/g, "").slice(0, 6);
-        }
-
-        function clearOtpDigits() {
-          if (otpRaw) otpRaw.value = "";
-          syncOtpDots();
-          syncOtpVerifyButton();
-        }
-
-        function syncOtpVerifyButton() {
-          otpVerifyBtn.disabled = otpDigits().length !== 6;
-        }
-
-        function syncOtpDots() {
-          var filled = otpDigits().length;
-          for (var i = 0; i < otpDotNodes.length; i++) {
-            otpDotNodes[i].classList.toggle("otp-code-dot--filled", i < filled);
-          }
-        }
-
-        function showToast(msg) {
-          var t = document.getElementById("toast");
-          t.textContent = msg;
-          t.classList.remove("opacity-0");
-          clearTimeout(showToast._h);
-          showToast._h = setTimeout(function () {
-            t.classList.add("opacity-0");
-          }, 2200);
-        }
-
-        document.getElementById("btn-eva").addEventListener("click", function () {
-          showToast("Ask EVA");
-        });
-        document.getElementById("btn-menu").addEventListener("click", function () {
-          showToast("Menu");
-        });
-
-        var mobile = document.getElementById("mobile");
-        var hint = document.getElementById("input-hint");
-        var btnOtp = document.getElementById("btn-otp");
-        var otpLabel = document.getElementById("otp-label");
-        var otpSpinner = document.getElementById("otp-spinner");
-        var frameRoot = document.querySelector(".frame-root");
-        var loginSheet = document.getElementById("login-sheet");
-        if (loginSheet) {
-          requestAnimationFrame(function () {
-            loginSheet.classList.add("is-visible");
-          });
-        }
-        var isMobileInputFocused = false;
-        var isOtpInputFocused = false;
         var otpSheetOpen = false;
-        var keyboardHandoffActive = false;
-
-        var defaultInfoText = "You’ll receive an OTP on this number";
-
-        function setInfoText(text, isError) {
-          infoText.textContent = text;
-          if (isError) {
-            infoText.classList.remove("text-neutral-500");
-            infoText.classList.add("text-red-600");
-          } else {
-            infoText.classList.remove("text-red-600");
-            infoText.classList.add("text-neutral-500");
-          }
-        }
-
-        mobile.addEventListener("input", function () {
-          this.value = this.value.replace(/\D/g, "").slice(0, 10);
-          hint.classList.add("hidden");
-          setInfoText(defaultInfoText, false);
-        });
-
-        /* -------------------------------------------------------------------------- *
-         * Keyboard lift module — uses window.visualViewport to find how much of the
-         * layout is covered by the soft keyboard, then translates .frame-root upward
-         * via CSS var --keyboard-lift (smooth 320ms ease-in-out). No innerHeight resize
-         * hacks; preventScroll on focus avoids iOS jump-scroll fighting this transform.
-         * -------------------------------------------------------------------------- */
         var MOBILE_FOCUS_LIFT_PX = 250;
-        var MOBILE_VIEWPORT_MAX_WIDTH = 768;
-        var liftDebounceTimer = null;
-        var liftRaf = null;
-        var lastLiftPx = -1;
+        var TABLET_MAX_WIDTH = 1024;
 
-        function visualViewportBottomY() {
-          var vv = window.visualViewport;
-          if (!vv) return window.innerHeight;
-          return vv.offsetTop + vv.height;
-        }
-
-        function clearKeyboardLift() {
-          lastLiftPx = -1;
-          if (frameRoot) frameRoot.style.setProperty("--keyboard-lift", "0px");
-        }
-
-        function shouldUseMobileFocusLift() {
-          var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-          var isMobileWidth = viewportWidth <= MOBILE_VIEWPORT_MAX_WIDTH;
-          var isTouchLikeDevice = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
-          return isMobileWidth || isTouchLikeDevice;
-        }
-
-        function applyKeyboardLift() {
+        function setLift(px) {
           if (!frameRoot) return;
-          if (liftRaf) cancelAnimationFrame(liftRaf);
-          liftRaf = requestAnimationFrame(function () {
-            liftRaf = null;
-            if (otpSheetOpen) {
-              /* Keep base sheet position stable while OTP overlays it. */
-              return;
-            }
-            if (isMobileInputFocused && !otpSheetOpen) {
-              if (!shouldUseMobileFocusLift()) {
-                if (lastLiftPx === 0) return;
-                lastLiftPx = 0;
-                frameRoot.style.setProperty("--keyboard-lift", "0px");
-                return;
-              }
-              var fixedLift = MOBILE_FOCUS_LIFT_PX;
-              if (fixedLift === lastLiftPx) return;
-              lastLiftPx = fixedLift;
-              frameRoot.style.setProperty("--keyboard-lift", fixedLift + "px");
-              return;
-            }
-            var margin = 14;
-            var bottomY = visualViewportBottomY();
-            var targetEl = otpSheetOpen ? otpVerifyBtn : btnOtp;
-            if (!targetEl) return;
-            var lift = Math.max(0, Math.round(targetEl.getBoundingClientRect().bottom - bottomY + margin));
-            var cap = Math.round(window.innerHeight * 0.92);
-            if (lift > cap) lift = cap;
-            if (lift === lastLiftPx) return;
-            lastLiftPx = lift;
-            frameRoot.style.setProperty("--keyboard-lift", lift + "px");
-          });
+          if (!shouldUseKeyboardLift()) {
+            frameRoot.style.setProperty("--keyboard-lift", "0px");
+            return;
+          }
+          frameRoot.style.setProperty("--keyboard-lift", px + "px");
         }
 
-        function scheduleApplyKeyboardLift() {
-          clearTimeout(liftDebounceTimer);
-          liftDebounceTimer = window.setTimeout(function () {
-            liftDebounceTimer = null;
-            if (!isMobileInputFocused && !isOtpInputFocused && !otpSheetOpen) {
-              clearKeyboardLift();
-              return;
-            }
-            applyKeyboardLift();
-          }, 48);
+        function shouldUseKeyboardLift() {
+          var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+          return viewportWidth <= TABLET_MAX_WIDTH;
         }
 
         function syncOtpSheetToLoginSheetTop() {
           if (!otpSheet || !loginSheet || !frameRoot || !otpSheetOpen) return;
-          /* Match OTP sheet geometry to #login-sheet so it stacks in the same place at every resolution. */
           var topPx;
           var heightPx;
           if (loginSheet.offsetParent === frameRoot) {
@@ -1120,22 +801,86 @@
             topPx = lr.top - rr.top;
             heightPx = lr.height;
           }
-          topPx = Math.round(topPx);
-          heightPx = Math.round(heightPx);
-          if (heightPx < 1) {
-            var parsed = parseInt(window.getComputedStyle(loginSheet).height, 10);
-            heightPx = isNaN(parsed) ? 320 : parsed;
-          }
-          otpSheet.style.top = topPx + "px";
+          otpSheet.style.top = Math.round(topPx) + "px";
           otpSheet.style.bottom = "auto";
-          otpSheet.style.height = heightPx + "px";
+          otpSheet.style.height = Math.max(1, Math.round(heightPx)) + "px";
+        }
+
+        function otpDigits() {
+          if (!otpRaw) return "";
+          return (otpRaw.value || "").replace(/\D/g, "").slice(0, 6);
+        }
+
+        function syncOtpUi() {
+          var digits = otpDigits();
+          if (otpRaw) otpRaw.value = digits;
+          if (otpVerifyBtn) otpVerifyBtn.disabled = digits.length !== 6;
+          for (var i = 0; i < otpDotNodes.length; i++) {
+            otpDotNodes[i].classList.toggle("otp-code-dot--filled", i < digits.length);
+          }
+        }
+
+        function openOtp(last4) {
+          otpSheetOpen = true;
+          if (otpLast4) otpLast4.textContent = last4;
+          if (otpRaw) otpRaw.value = "";
+          syncOtpUi();
+          syncOtpSheetToLoginSheetTop();
+          if (mobile) mobile.readOnly = true;
+          otpSheet.classList.remove("opacity-0", "pointer-events-none");
+          otpSheet.classList.add("opacity-100", "pointer-events-auto");
+          otpBackdrop.classList.remove("opacity-0", "pointer-events-none");
+          otpBackdrop.classList.add("opacity-100", "pointer-events-auto");
+          requestAnimationFrame(function () {
+            syncOtpSheetToLoginSheetTop();
+            otpSheet.classList.add("is-open");
+            if (otpRaw) {
+              try {
+                otpRaw.focus({ preventScroll: true });
+              } catch (_) {
+                otpRaw.focus();
+              }
+            }
+            setLift(MOBILE_FOCUS_LIFT_PX);
+          });
+        }
+
+        if (loginSheet) {
+          requestAnimationFrame(function () {
+            loginSheet.classList.add("is-visible");
+          });
+        }
+
+        if (mobile) {
+          mobile.addEventListener("focus", function () {
+            if (!otpSheetOpen) setLift(MOBILE_FOCUS_LIFT_PX);
+          });
+          mobile.addEventListener("blur", function () {
+            /* Some browsers fire a transient blur while bringing up native keyboard.
+               Delay collapse so first tap does not flicker. */
+            window.setTimeout(function () {
+              if (document.activeElement === mobile) return;
+              if (!otpSheetOpen) setLift(0);
+            }, 80);
+          });
+          mobile.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, "").slice(0, 10);
+            if (hint) hint.classList.add("hidden");
+            if (infoText) {
+              infoText.textContent = "You’ll receive an OTP on this number";
+              infoText.classList.remove("text-red-600");
+              infoText.classList.add("text-neutral-500");
+            }
+          });
         }
 
         if (window.visualViewport) {
-          window.visualViewport.addEventListener("resize", scheduleApplyKeyboardLift);
-          window.visualViewport.addEventListener("scroll", scheduleApplyKeyboardLift);
+          window.visualViewport.addEventListener("resize", function () {
+            if (otpSheetOpen) syncOtpSheetToLoginSheetTop();
+          });
         }
         window.addEventListener("resize", function () {
+          if (!shouldUseKeyboardLift()) setLift(0);
           if (otpSheetOpen) syncOtpSheetToLoginSheetTop();
         });
         if (typeof ResizeObserver !== "undefined" && loginSheet) {
@@ -1143,227 +888,37 @@
             if (otpSheetOpen) syncOtpSheetToLoginSheetTop();
           }).observe(loginSheet);
         }
-        if (typeof ResizeObserver !== "undefined" && frameRoot) {
-          new ResizeObserver(function () {
-            if (otpSheetOpen) syncOtpSheetToLoginSheetTop();
-          }).observe(frameRoot);
-        }
-
-        mobile.addEventListener("pointerdown", function (ev) {
-          if (ev.pointerType && ev.pointerType !== "mouse") return;
-          if (document.activeElement !== mobile) {
-            try {
-              mobile.focus({ preventScroll: true });
-            } catch (e) {
-              mobile.focus();
-            }
-          }
-        });
-
-        mobile.addEventListener("focus", function () {
-          isMobileInputFocused = true;
-          scheduleApplyKeyboardLift();
-        });
-
-        mobile.addEventListener("blur", function () {
-          isMobileInputFocused = false;
-          if (keyboardHandoffActive) {
-            scheduleApplyKeyboardLift();
-            return;
-          }
-          if (!isOtpInputFocused && !otpSheetOpen) clearKeyboardLift();
-          else scheduleApplyKeyboardLift();
-        });
-
-        if (otpCodeField) {
-          otpCodeField.addEventListener("focusin", function () {
-            isOtpInputFocused = true;
-            scheduleApplyKeyboardLift();
-          });
-          otpCodeField.addEventListener("focusout", function () {
-            window.setTimeout(function () {
-              if (otpCodeField.contains(document.activeElement)) return;
-              isOtpInputFocused = false;
-              if (!isMobileInputFocused && !otpSheetOpen) clearKeyboardLift();
-              else scheduleApplyKeyboardLift();
-            }, 0);
-          });
-        }
 
         if (otpRaw) {
-          otpRaw.addEventListener("pointerdown", function () {
-            if (document.activeElement !== otpRaw) {
-              try {
-                otpRaw.focus({ preventScroll: true });
-              } catch (e1) {
-                otpRaw.focus();
-              }
-            }
-          });
           otpRaw.addEventListener("input", function () {
-            this.value = this.value.replace(/\D/g, "").slice(0, 6);
-            syncOtpDots();
-            syncOtpVerifyButton();
-            scheduleApplyKeyboardLift();
+            syncOtpUi();
           });
         }
 
-        function focusOtpField() {
-          if (!otpRaw) return;
-          try {
-            otpRaw.focus({ preventScroll: true });
-          } catch (e5) {
-            otpRaw.focus();
-          }
-          requestAnimationFrame(function () {
-            try {
-              otpRaw.focus({ preventScroll: true });
-            } catch (e6) {
-              otpRaw.focus();
+        if (btnOtp) {
+          btnOtp.addEventListener("click", function () {
+            var v = mobile ? mobile.value.trim() : "";
+            if (!/^\d{10}$/.test(v)) {
+              if (infoText) {
+                infoText.textContent = "Enter valid Mobile number";
+                infoText.classList.remove("text-neutral-500");
+                infoText.classList.add("text-red-600");
+              }
+              if (mobile) mobile.focus();
+              return;
             }
+            openOtp(v.slice(-4));
           });
         }
 
-        function handOffFocusMobileToOtp() {
-          /* Flag first so a synchronous mobile blur during OTP focus does not zero the lift. */
-          keyboardHandoffActive = true;
-          mobile.readOnly = true;
-          focusOtpField();
-          window.setTimeout(function () {
-            keyboardHandoffActive = false;
-            scheduleApplyKeyboardLift();
-          }, 200);
-        }
-
-        function openOtp(last4) {
-          otpLast4.textContent = last4;
-          cancelAnimationFrame(openOtp._openRaf || 0);
-
-          if (
-            otpSheet.classList.contains("is-open") &&
-            otpSheet.classList.contains("pointer-events-auto")
-          ) {
-            clearOtpDigits();
-            handOffFocusMobileToOtp();
-            return;
-          }
-
-          clearOtpDigits();
-          clearTimeout(openOtp._focusTimer);
-          openOtp._focusTimer = null;
-
-          otpSheetOpen = true;
-          syncOtpSheetToLoginSheetTop();
-          /* readOnly keeps the numeric IME session while focus moves to OTP fields (no intentional blur-dismiss). */
-          mobile.readOnly = true;
-
-          /* Focus handoff first keeps the native keyboard alive on more mobile browsers. */
-          handOffFocusMobileToOtp();
-          otpSheet.classList.remove("opacity-0", "pointer-events-none");
-          otpSheet.classList.add("opacity-100", "pointer-events-auto");
-          otpBackdrop.classList.remove("opacity-0", "pointer-events-none");
-          otpBackdrop.classList.add("opacity-100", "pointer-events-auto");
-          openOtp._openRaf = requestAnimationFrame(function () {
-            syncOtpSheetToLoginSheetTop();
-            otpSheet.classList.add("is-open");
+        if (otpVerifyBtn) {
+          otpVerifyBtn.addEventListener("click", function () {
+            if (otpDigits().length !== 6) return;
+            window.location.href = "verify.html";
           });
         }
 
-        function closeOtp() {
-          otpSheetOpen = false;
-          keyboardHandoffActive = false;
-          mobile.readOnly = false;
-          cancelAnimationFrame(openOtp._openRaf || 0);
-          clearTimeout(openOtp._focusTimer);
-          openOtp._focusTimer = null;
-          if (document.activeElement && otpCodeField && otpCodeField.contains(document.activeElement)) {
-            document.activeElement.blur();
-          }
-          clearOtpDigits();
-          otpSheet.classList.remove("is-open");
-          otpSheet.classList.add("opacity-0", "pointer-events-none");
-          otpSheet.classList.remove("opacity-100", "pointer-events-auto");
-          otpBackdrop.classList.add("opacity-0", "pointer-events-none");
-          otpBackdrop.classList.remove("opacity-100", "pointer-events-auto");
-          if (otpSheet) {
-            otpSheet.style.removeProperty("top");
-            otpSheet.style.removeProperty("bottom");
-            otpSheet.style.removeProperty("height");
-          }
-          isOtpInputFocused = false;
-          if (!isMobileInputFocused) clearKeyboardLift();
-          else scheduleApplyKeyboardLift();
-        }
-
-        otpBackdrop.addEventListener("click", function () {
-          closeOtp();
-        });
-
-        otpResend.addEventListener("click", function (e) {
-          e.preventDefault();
-          showToast("Resent OTP");
-        });
-
-        document.getElementById("otp-change-mobile").addEventListener("click", function (e) {
-          e.preventDefault();
-          closeOtp();
-          window.setTimeout(function () {
-            try {
-              mobile.focus({ preventScroll: true });
-            } catch (e7) {
-              mobile.focus();
-            }
-          }, 50);
-        });
-
-        otpVerifyBtn.addEventListener("click", function () {
-          if (otpDigits().length !== 6) {
-            showToast("Enter the 6-digit OTP");
-            return;
-          }
-          window.location.href = "verify.html";
-        });
-
-        syncOtpDots();
-        syncOtpVerifyButton();
-
-        var getOtpFlowActive = false;
-        function runGetOtpFlow() {
-          if (btnOtp.disabled || getOtpFlowActive) return;
-          var v = mobile.value.trim();
-          if (!/^\d{10}$/.test(v)) {
-            hint.classList.add("hidden");
-            setInfoText("Enter valid Mobile number", true);
-            try {
-              mobile.focus({ preventScroll: true });
-            } catch (e8) {
-              mobile.focus();
-            }
-            return;
-          }
-
-          getOtpFlowActive = true;
-          setInfoText(defaultInfoText, false);
-          btnOtp.disabled = true;
-          btnOtp.setAttribute("aria-busy", "true");
-          otpLabel.classList.add("hidden");
-          otpSpinner.classList.remove("hidden");
-
-          openOtp(v.slice(-4));
-
-          window.setTimeout(function () {
-            otpSpinner.classList.add("hidden");
-            otpLabel.classList.remove("hidden");
-            otpLabel.textContent = "Get OTP";
-            btnOtp.disabled = false;
-            btnOtp.setAttribute("aria-busy", "false");
-            getOtpFlowActive = false;
-          }, 1500);
-        }
-
-        btnOtp.addEventListener("click", function () {
-          runGetOtpFlow();
-        });
+        syncOtpUi();
       })();
     </script>
   </body>
